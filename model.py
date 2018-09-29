@@ -253,9 +253,9 @@ class cyclegan(object):
         batch_files_A = list(dataA[idx * self.batch_size:(idx + 1) * self.batch_size])
         batch_files_B = list(dataB[idx * self.batch_size:(idx + 1) * self.batch_size])
 
-        batch_images_A = [load_train_data(batch_file, args.load_size_A) for batch_file in batch_files_A]
+        batch_images_A = [load_train_data(batch_file, self.image_size_A ) for batch_file in batch_files_A]
 
-        batch_images_B = [load_train_data(batch_file, args.load_size_B) for batch_file in batch_files_B]
+        batch_images_B = [load_train_data(batch_file,self.image_size_B) for batch_file in batch_files_B]
 
         sample_images_A = np.array(batch_images_A).astype(np.float32)
 
