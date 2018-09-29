@@ -275,7 +275,7 @@ class cyclegan(object):
         # save_images(fake_A, [self.batch_size, 1],
         #             './{}/A_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
         save_images(fake_B, [self.batch_size, 1],
-                    './{}/B_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
+                    '{}/B_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
 
 
 
