@@ -251,10 +251,10 @@ class cyclegan(object):
         np.random.shuffle(dataB)
         print(len(dataA))
         idx = idx%min(len(dataA),len(dataB))
-        print(idx)
+        # print(idx)
         batch_files_A = list([dataA[idx]])
         batch_files_B = list([dataB[idx]])
-        print(batch_files_A)
+        # print(batch_files_A)
         batch_images_A = [load_train_data(batch_file, self.image_size_A ) for batch_file in batch_files_A]
 
         batch_images_B = [load_train_data(batch_file,self.image_size_B) for batch_file in batch_files_B]
@@ -263,16 +263,15 @@ class cyclegan(object):
 
         sample_images_B = np.array(batch_images_B).astype(np.float32)
 
-<<<<<<< HEAD
-        
+
         fake_B = self.sess.run(
             [self.fake_B],
             feed_dict={self.real_A: sample_images_A,self.real_B: sample_images_B}
         )
-=======
-        print("sampleing ",sample_images_A.shape)
+
+        # print("sampleing ",sample_images_A.shape)
         fake_B = self.sess.run(self.fake_B, feed_dict = {self.real_A: sample_images_A,self.real_B: sample_images_B})
->>>>>>> 8bbedcabe7566a87c972239599f3bc5726c08701
+
         # save_images(fake_A, [self.batch_size, 1],
         #             './{}/A_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
         save_images(fake_B, [self.batch_size, 1],
