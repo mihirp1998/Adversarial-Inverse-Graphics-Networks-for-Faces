@@ -261,7 +261,7 @@ class cyclegan(object):
 
         sample_images_B = np.array(batch_images_B).astype(np.float32)
 
-
+        
         fake_B = self.sess.run(
             [self.fake_B],
             feed_dict={self.real_A: sample_images_A,self.real_B: sample_images_B}
