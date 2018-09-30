@@ -208,8 +208,8 @@ class cyclegan(object):
 
                 if np.mod(counter, args.print_freq) == 1:
                     self.sample_model(args.sample_dir, epoch, idx)
-                    print(("Epoch: [%2d] [%4d/%4d] time: %4.4f" % (epoch, idx, batch_idxs, time.time() - start_time)))
-                    print("Generator Loss {} discriminator loss {}".format(summary_str_G,summary_str_D))
+                    # print(("Epoch: [%2d] [%4d/%4d] time: %4.4f" % (epoch, idx, batch_idxs, time.time() - start_time)))
+                    # print("Generator Loss {} discriminator loss {}".format(summary_str_G,summary_str_D))
                 if np.mod(counter, args.save_freq) == 2:
                     self.save(args.checkpoint_dir, counter)
 
