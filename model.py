@@ -185,22 +185,22 @@ class cyclegan(object):
                 batch_images_B = np.array(batch_images_B).astype(np.float32)
 
                 # Update G network and record fake outputs
-                fake_B, _, summary_str = self.sess.run(
+                fake_B, _, summary_str_G = self.sess.run(
                     [self.fake_B, self.g_optim, self.g_loss_a2b_sum],
                     feed_dict={self.real_A: batch_images_A,self.real_B: batch_images_B, self.lr: lr})
 
-                self.writer.add_summary(summary_str, counter)
+                self.writer.add_summary(summary_str_G, counter)
 
                 [fake_B] = self.pool([fake_B])
 
                 # Update D network
-                _, summary_str = self.sess.run(
+                _, summary_str_D = self.sess.run(
                     [self.d_optim, self.d_sum],
                     feed_dict={self.real_A: batch_images_A,self.real_B: batch_images_B,
                                self.fake_B_sample: fake_B,
                                self.lr: lr})
 
-                self.writer.add_summary(summary_str, counter)
+                self.writer.add_summary(summary_str_D, counter)
 
                 counter += 1
 
@@ -209,6 +209,7 @@ class cyclegan(object):
                 if np.mod(counter, args.print_freq) == 1:
                     self.sample_model(args.sample_dir, epoch, idx)
                     print(("Epoch: [%2d] [%4d/%4d] time: %4.4f" % (epoch, idx, batch_idxs, time.time() - start_time)))
+                    print("Generator Loss {} discriminator loss {}".format(summary_str_G,summary_str_D))
                 if np.mod(counter, args.save_freq) == 2:
                     self.save(args.checkpoint_dir, counter)
 
