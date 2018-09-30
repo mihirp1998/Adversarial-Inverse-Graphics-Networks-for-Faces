@@ -268,7 +268,7 @@ class cyclegan(object):
             feed_dict={self.real_A: sample_images_A,self.real_B: sample_images_B}
         )
 
-        # print("sampleing ",sample_images_A.shape) =`````````````````````````````````````````````````````````````````````````````````````````````````
+        # print("sampleing ",sample_images_A.shape)
         fake_B = self.sess.run(self.fake_B, feed_dict = {self.real_A: sample_images_A,self.real_B: sample_images_B})
 
         # save_images(fake_A, [self.batch_size, 1],
