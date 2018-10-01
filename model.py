@@ -257,7 +257,7 @@ class cyclegan(object):
         # idx = idx%min(len(dataA),len(dataB))
         # print(idx)
         batch_files_A = list(dataA[:self.batch_size])
-        batch_files_B = list(dataA[:self.batch_size])
+        batch_files_B = list(dataB[:self.batch_size])
         # print(batch_files_A)
         batch_images_A = [load_train_data(batch_file, self.image_size_A ) for batch_file in batch_files_A]
 
