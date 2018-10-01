@@ -26,7 +26,7 @@ def discriminator(image, options, reuse=False, name="discriminator"):
         h3_flat = tf.layers.flatten(h3,name="flatten")
         print(h3_flat,"flat")
         print("what")
-        logit = tf.contrib.layers.fully_connected(h3_flat,1,activation_fn=tf.sigmoid)
+        logit = tf.contrib.layers.fully_connected(h3_flat,1)
 
         return logit
 

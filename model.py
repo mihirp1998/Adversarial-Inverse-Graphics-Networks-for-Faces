@@ -25,10 +25,8 @@ class cyclegan(object):
         self.generator = generator_resnet
         # else:
         #     self.generator = generator_unet
-        if args.use_lsgan:
-            self.criterionGAN = mae_criterion
-        else:
-            self.criterionGAN = sce_criterion
+
+        self.criterionGAN = sce_criterion
 
         OPTIONS = namedtuple('OPTIONS', 'batch_size image_size_A image_size_B \
                               gf_dim df_dim output_c_dim is_training')
@@ -70,7 +68,7 @@ class cyclegan(object):
 
 
         self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) 
-            # + self.L1_lambda * abs_criterion(self.real_A, self.render)
+            # + self.L1_lambda * mae_criterion(self.real_A, self.render)
 
 
         # self.g_loss_b2a = self.criterionGAN(self.DA_fake, tf.ones_like(self.DA_fake)) \
