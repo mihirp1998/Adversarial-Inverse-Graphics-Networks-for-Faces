@@ -4,7 +4,7 @@ from ops import *
 from utils import *
 
 
-def discriminator(image, options, reuse=False, name="discriminator2"):
+def discriminator(image, options, reuse=False, name="discriminator"):
 
     with tf.variable_scope(name):
         # image is 256 x 256 x input_c_dim
