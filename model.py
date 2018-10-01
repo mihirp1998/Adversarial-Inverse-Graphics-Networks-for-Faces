@@ -133,6 +133,7 @@ class cyclegan(object):
         # self.testA = self.generator(self.test_B, self.options, True, name="generatorB2A")
 
         t_vars = tf.trainable_variables()
+
         self.d_vars = [var for var in t_vars if 'discriminator' in var.name]
         self.g_vars = [var for var in t_vars if 'generator' in var.name]
         print("discriminator variables ",len(self.d_vars), " generator variables ",len(self.d_vars))
@@ -265,10 +266,6 @@ class cyclegan(object):
         sample_images_B = np.array(batch_images_B).astype(np.float32)
 
 
-        fake_B = self.sess.run(
-            [self.fake_B],
-            feed_dict={self.real_A: sample_images_A,self.real_B: sample_images_B}
-        )
 
         # print("sampleing ",sample_images_A.shape)
         fake_B = self.sess.run(self.fake_B, feed_dict = {self.real_A: sample_images_A,self.real_B: sample_images_B})
