@@ -69,8 +69,10 @@ class cyclegan(object):
         # self.DA_fake = self.discriminator(self.fake_A, self.options, reuse=False, name="discriminatorA")
 
 
-        self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) \
-            + self.L1_lambda * abs_criterion(self.real_A, self.render)
+        self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) 
+            # + self.L1_lambda * abs_criterion(self.real_A, self.render)
+
+
         # self.g_loss_b2a = self.criterionGAN(self.DA_fake, tf.ones_like(self.DA_fake)) \
         #     + self.L1_lambda * abs_criterion(self.real_A, self.fake_A_) \
         #     + self.L1_lambda * abs_criterion(self.real_B, self.fake_B_)
@@ -247,15 +249,15 @@ class cyclegan(object):
 
 
     def sample_model(self, sample_dir, epoch, idx):
-        dataA = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/testA'))
-        dataB = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/testB'))
+        dataA = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/trainA'))
+        dataB = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/trainB'))
         np.random.shuffle(dataA)
         np.random.shuffle(dataB)
         print(len(dataA))
         idx = idx%min(len(dataA),len(dataB))
         # print(idx)
-        batch_files_A = list([dataA[idx]])
-        batch_files_B = list([dataB[idx]])
+        batch_files_A = list(dataA[:self.batch_size])
+        batch_files_B = list(dataA[:self.batch_size])
         # print(batch_files_A)
         batch_images_A = [load_train_data(batch_file, self.image_size_A ) for batch_file in batch_files_A]
 
@@ -269,6 +271,7 @@ class cyclegan(object):
 
         # print("sampleing ",sample_images_A.shape)
         [fake_B,real_B] = self.sess.run([self.fake_B,self.real_B], feed_dict = {self.real_A: sample_images_A,self.real_B: sample_images_B})
+
 
         # save_images(fake_A, [self.batch_size, 1],
         #             './{}/A_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
