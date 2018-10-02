@@ -68,7 +68,7 @@ class cyclegan(object):
 
 
         self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) 
-            # + self.L1_lambda * mae_criterion(self.real_A, self.render)
+            + self.L1_lambda * mae_criterion(self.real_A, self.render)
 
 
         # self.g_loss_b2a = self.criterionGAN(self.DA_fake, tf.ones_like(self.DA_fake)) \
@@ -187,8 +187,8 @@ class cyclegan(object):
                 batch_images_B = np.array(batch_images_B).astype(np.float32)
 
                 # Update G network and record fake outputs
-                fake_B, _, summary_str_G = self.sess.run(
-                    [self.fake_B, self.g_optim, self.g_loss_a2b_sum],
+                fake_B, _, summary_str_G,gen_loss = self.sess.run(
+                    [self.fake_B, self.g_optim, self.g_loss_a2b_sum, self.g_loss_a2b ],
                     feed_dict={self.real_A: batch_images_A,self.real_B: batch_images_B, self.lr: lr})
 
                 self.writer.add_summary(summary_str_G, counter)
@@ -196,8 +196,8 @@ class cyclegan(object):
                 [fake_B] = self.pool([fake_B])
 
                 # Update D network
-                _, summary_str_D = self.sess.run(
-                    [self.d_optim, self.d_sum],
+                _, summary_str_D,dis_loss = self.sess.run(
+                    [self.d_optim, self.d_sum,self.db_loss],
                     feed_dict={self.real_A: batch_images_A,self.real_B: batch_images_B,
                                self.fake_B_sample: fake_B,
                                self.lr: lr})
@@ -211,6 +211,7 @@ class cyclegan(object):
                 if np.mod(counter, args.print_freq) == 1:
                     self.sample_model(args.sample_dir, epoch, idx)
                     print(("Epoch: [%2d] [%4d/%4d] time: %4.4f" % (epoch, idx, batch_idxs, time.time() - start_time)))
+                    print("Gen Loss ",gen_loss," Dis Loss ",dis_loss)
                     # print(summary_str_G,summary_str_D)
                 if np.mod(counter, args.save_freq) == 2:
                     self.save(args.checkpoint_dir, counter)
