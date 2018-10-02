@@ -7,7 +7,7 @@ from tensorflow.python.framework import ops
 from utils import *
 
 def batch_norm(x,is_training, name="batch_norm"):
-    return tf.contrib.layers.batch_norm(x, decay=0.9, updates_collections=None, epsilon=1e-5, scale=True, scope=name,training= is_training)
+    return tf.contrib.layers.batch_norm(x, decay=0.9, updates_collections=None, epsilon=1e-5, scale=True, scope=name,is_training= is_training)
 
 def instance_norm(input, name="instance_norm"):
     with tf.variable_scope(name):
