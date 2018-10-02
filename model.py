@@ -67,8 +67,7 @@ class cyclegan(object):
         # self.DA_fake = self.discriminator(self.fake_A, self.options, reuse=False, name="discriminatorA")
 
 
-        self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) 
-            + self.L1_lambda * mae_criterion(self.real_A, self.render)
+        self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) + self.L1_lambda * mae_criterion(self.real_A, self.render)
 
 
         # self.g_loss_b2a = self.criterionGAN(self.DA_fake, tf.ones_like(self.DA_fake)) \
