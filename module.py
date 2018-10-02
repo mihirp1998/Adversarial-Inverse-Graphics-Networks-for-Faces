@@ -26,7 +26,7 @@ def discriminator(image, options,is_training, reuse=False, name="discriminator")
         h3_flat = tf.layers.flatten(h3,name="flatten")
 
         logit = tf.layers.dense(h3_flat,1,kernel_initializer=tf.truncated_normal_initializer(stddev=0.1414))
-        logit = batch_norm(logits,is_training, 'd_bn5')
+        logit = batch_norm(logit,is_training, 'd_bn5')
         logit = tf.nn.relu(logit)
         return logit
 
