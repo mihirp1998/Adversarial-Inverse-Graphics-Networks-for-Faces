@@ -13,7 +13,7 @@ def discriminator(image, options,is_training, reuse=False, name="discriminator")
         else:
             assert tf.get_variable_scope().reuse is False    
         c1 = tf.nn.relu(instance_norm(conv2d(image, 3, 7, 1, padding='SAME', name='d_h_conv'), 'd_bn'))
-        h0 = lrelu(batch_norm(conv2d(c1,64, name='d_h0_conv',use_bias=False),is_training, 'd_bn1'))
+        h0 = lrelu(batch_norm(conv2d(c1,64, name='d_h0_conv',use_bias=False),is_training, 'd_bn0'))
         # h0 is (128 x 128 x self.df_dim)
         h1 = lrelu(batch_norm(conv2d(h0,64*2, name='d_h1_conv',use_bias=False),is_training, 'd_bn1'))
         # h1 is (64 x 64 x self.df_dim*2)
