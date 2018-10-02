@@ -127,7 +127,7 @@ def generator_resnet(image, options,is_training, reuse=False, name="generator"):
 
         c2 = tf.nn.relu(batch_norm(conv2d(image, 64, 3, 1, padding='SAME', name='first_conv',use_bias=False),is_training,'first_bn'))
         d1 = deconv2d(c2, 256, 3, 2, name='g_d1_dc1')
-        d1 = tf.nn.relu(d2)
+        d1 = tf.nn.relu(d1)
         d2 = deconv2d(d1, 256, 3, 2, name='g_d2_dc')
         d2 = tf.nn.relu(d2)
 
