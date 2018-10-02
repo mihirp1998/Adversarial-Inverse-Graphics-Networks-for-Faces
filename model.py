@@ -57,13 +57,13 @@ class cyclegan(object):
         # self.real_A = self.real_data[:, :, :, :self.input_c_dim]
         # self.real_B = self.real_data[:, :, :, self.input_c_dim:self.input_c_dim + self.output_c_dim]
 
-        self.fake_B = self.generator(self.real_A, self.options, False, name="generatorA2B")
+        self.fake_B = self.generator(self.real_A, self.options,True, False, name="generatorA2B")
         # self.fake_A_ = self.generator(self.fake_B, self.options, False, name="generatorB2A")
         
         # self.fake_A = self.generator(self.real_B, self.options, True, name="generatorB2A")
         # self.fake_B_ = self.generator(self.fake_A, self.options, True, name="generatorA2B")
         self.render = self.render(self.fake_B) 
-        self.DB_fake = self.discriminator(self.fake_B, self.options, reuse=False, name="discriminatorB")
+        self.DB_fake = self.discriminator(self.fake_B, self.options,True, reuse=False, name="discriminatorB")
         # self.DA_fake = self.discriminator(self.fake_A, self.options, reuse=False, name="discriminatorA")
 
 
@@ -91,9 +91,9 @@ class cyclegan(object):
                                              self.output_c_dim], name='fake_B_sample')
 
 
-        self.DB_real = self.discriminator(self.real_B, self.options, reuse=True, name="discriminatorB")
+        self.DB_real = self.discriminator(self.real_B, self.options,True, reuse=True, name="discriminatorB")
         # self.DA_real = self.discriminator(self.real_A, self.options, reuse=True, name="discriminatorA")
-        self.DB_fake_sample = self.discriminator(self.fake_B_sample, self.options, reuse=True, name="discriminatorB")
+        self.DB_fake_sample = self.discriminator(self.fake_B_sample, self.options,True, reuse=True, name="discriminatorB")
         # self.DA_fake_sample = self.discriminator(self.fake_A_sample, self.options, reuse=True, name="discriminatorA")
 
         self.db_loss_real = self.criterionGAN(self.DB_real, tf.ones_like(self.DB_real))
@@ -128,7 +128,7 @@ class cyclegan(object):
         # self.test_B = tf.placeholder(tf.float32,
         #                              [None, self.image_size, self.image_size,
         #                               self.output_c_dim], name='test_B')
-        self.testB = self.generator(self.test_A, self.options, True, name="generatorA2B")
+        self.testB = self.generator(self.test_A, self.options,False, True, name="generatorA2B")
         # self.testA = self.generator(self.test_B, self.options, True, name="generatorB2A")
 
         t_vars = tf.trainable_variables()
@@ -268,7 +268,7 @@ class cyclegan(object):
 
 
         # print("sampleing ",sample_images_A.shape)
-        [fake_B] = self.sess.run([self.fake_B], feed_dict = {self.real_A: sample_images_A,self.real_B: sample_images_B})
+        [fake_B] = self.sess.run([self.testB], feed_dict = {self.test_A: sample_images_A})
 
 
         # save_images(fake_A, [self.batch_size, 1],

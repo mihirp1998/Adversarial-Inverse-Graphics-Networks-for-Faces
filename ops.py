@@ -6,8 +6,8 @@ from tensorflow.python.framework import ops
 
 from utils import *
 
-def batch_norm(x, name="batch_norm"):
-    return tf.contrib.layers.batch_norm(x, decay=0.9, updates_collections=None, epsilon=1e-5, scale=True, scope=name)
+def batch_norm(x,is_training, name="batch_norm"):
+    return tf.contrib.layers.batch_norm(x, decay=0.9, updates_collections=None, epsilon=1e-5, scale=True, scope=name,training= is_training)
 
 def instance_norm(input, name="instance_norm"):
     with tf.variable_scope(name):
@@ -20,13 +20,13 @@ def instance_norm(input, name="instance_norm"):
         normalized = (input-mean)*inv
         return scale*normalized + offset
 
-def conv2d(input_, output_dim, ks=4, s=2, stddev=0.02, padding='SAME', name="conv2d"):
+def conv2d(input_, output_dim, ks=4, s=2, stddev=0.141, padding='SAME', name="conv2d",use_bias= True):
     with tf.variable_scope(name):
         return slim.conv2d(input_, output_dim, ks, s, padding=padding, activation_fn=None,
                             weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
-                            biases_initializer=None)
+                            biases_initializer=None,use_bias=use_bias)
 
-def deconv2d(input_, output_dim, ks=4, s=2, stddev=0.02, name="deconv2d"):
+def deconv2d(input_, output_dim, ks=4, s=2, stddev=0.141, name="deconv2d"):
     with tf.variable_scope(name):
         return slim.conv2d_transpose(input_, output_dim, ks, s, padding='SAME', activation_fn=None,
                                     weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
@@ -35,7 +35,7 @@ def deconv2d(input_, output_dim, ks=4, s=2, stddev=0.02, name="deconv2d"):
 def lrelu(x, leak=0.2, name="lrelu"):
     return tf.maximum(x, leak*x)
 
-def linear(input_, output_size, scope=None, stddev=0.02, bias_start=0.0, with_w=False):
+def linear(input_, output_size, scope=None, stddev=0.141, bias_start=0.0, with_w=False):
 
     with tf.variable_scope(scope or "Linear"):
         matrix = tf.get_variable("Matrix", [input_.get_shape()[-1], output_size], tf.float32,

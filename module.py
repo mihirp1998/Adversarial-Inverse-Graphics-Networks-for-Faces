@@ -4,7 +4,7 @@ from ops import *
 from utils import *
 
 
-def discriminator(image, options, reuse=False, name="discriminator"):
+def discriminator(image, options,is_training, reuse=False, name="discriminator"):
 
     with tf.variable_scope(name):
         # image is 256 x 256 x input_c_dim
@@ -13,20 +13,19 @@ def discriminator(image, options, reuse=False, name="discriminator"):
         else:
             assert tf.get_variable_scope().reuse is False    
         c1 = tf.nn.relu(instance_norm(conv2d(image, 3, 7, 1, padding='SAME', name='d_h_conv'), 'd_bn'))
-        h0 = lrelu(conv2d(c1, 64, name='d_h0_conv'))
+        h0 = lrelu(batch_norm(conv2d(c1,64, name='d_h0_conv',use_bias=False),is_training, 'd_bn1'))
         # h0 is (128 x 128 x self.df_dim)
-        h1 = lrelu(instance_norm(conv2d(h0,64*2, name='d_h1_conv'), 'd_bn1'))
+        h1 = lrelu(batch_norm(conv2d(h0,64*2, name='d_h1_conv',use_bias=False),is_training, 'd_bn1'))
         # h1 is (64 x 64 x self.df_dim*2)
-        h2 = lrelu(instance_norm(conv2d(h1, 64*4, name='d_h2_conv'), 'd_bn2'))
+        h2 = lrelu(batch_norm(conv2d(h1, 64*4, name='d_h2_conv',use_bias=False),is_training, 'd_bn2'))
         # h2 is (32x 32 x self.df_dim*4)
-        h3 = lrelu(instance_norm(conv2d(h2, 64*8, name='d_h3_conv'), 'd_bn3'))
+        h3 = lrelu(batch_norm(conv2d(h2, 64*8, name='d_h3_conv',use_bias=False),is_training, 'd_bn3'))
         # h3 is (32 x 32 x self.df_dim*8)
-        h3 = lrelu(instance_norm(conv2d(h3, 64*8, name='d_h4_conv'), 'd_bn4'))
+        h3 = lrelu(batch_norm(conv2d(h3, 64*8, name='d_h4_conv',use_bias=False),is_training, 'd_bn4'))
         # print(h3)
         h3_flat = tf.layers.flatten(h3,name="flatten")
-        print(h3_flat,"flat")
-        print("what")
-        logit = tf.contrib.layers.fully_connected(h3_flat,1)
+
+        logit = tf.contrib.layers.fully_connected(h3_flat,1,weights_initializer=tf.truncated_normal_initializer(stddev=0.1414))
 
         return logit
 
@@ -95,7 +94,7 @@ def generator_unet(image, options, reuse=False, name="generator"):
         return tf.nn.tanh(d8)
 
 
-def generator_resnet(image, options, reuse=False, name="generator"):
+def generator_resnet(image, options,is_training, reuse=False, name="generator"):
 
     with tf.variable_scope(name):
         # image is 256 x 256 x input_c_dim
@@ -105,15 +104,15 @@ def generator_resnet(image, options, reuse=False, name="generator"):
             assert tf.get_variable_scope().reuse is False
 
         def residule_block(x, dim, ks=3, s=1, name='res'):
-            p = int((ks - 1) / 2)
-            y = tf.pad(x, [[0, 0], [p, p], [p, p], [0, 0]], "REFLECT")
-            y = instance_norm(conv2d(y, dim, ks, s, padding='VALID', name=name+'_c1'), name+'_bn1')
-            y = tf.pad(tf.nn.relu(y), [[0, 0], [p, p], [p, p], [0, 0]], "REFLECT")
-            y = instance_norm(conv2d(y, dim, ks, s, padding='VALID', name=name+'_c2'), name+'_bn2')
+            y = conv2d(x, dim, ks, s, padding='SAME', name=name+'_c1',use_bias=False)
+            y = batch_norm(y,is_training, name+'_bn1')
+            y = tf.nn.relu(y)
+            y = conv2d(y, dim, ks, s, padding='SAME', name=name+'_c2',use_bias = False)
+            y = batch_norm(y,is_training,name+ '_bn2')
             return y + x
 
 
-        c1 = tf.nn.relu(instance_norm(conv2d(image, 64, 7, 1, padding='SAME', name='init_conv'), 'init_bn'))
+        c1 = tf.nn.relu(batch_norm(conv2d(image, 64, 7, 1, padding='SAME', name='init_conv',use_bias=False),is_training, 'init_bn'))
 
         
         r1 = residule_block(c1, 64, name='g_r1')
@@ -126,14 +125,13 @@ def generator_resnet(image, options, reuse=False, name="generator"):
         r8 = residule_block(r7, 64, name='g_r8')
         r9 = residule_block(r8, 64, name='g_r9')
 
-        c2 = tf.nn.relu(instance_norm(conv2d(image, 64, 3, 1, padding='SAME', name='first_conv'), 'first_bn'))
+        c2 = tf.nn.relu(batch_norm(conv2d(image, 64, 3, 1, padding='SAME', name='first_conv',use_bias=False),is_training,'first_bn'))
         d1 = deconv2d(c2, 256, 3, 2, name='g_d1_dc1')
-        d1 = tf.nn.relu(instance_norm(d1, 'g_d1_bn'))
+        d1 = tf.nn.relu(d2)
         d2 = deconv2d(d1, 256, 3, 2, name='g_d2_dc')
-        d2 = tf.nn.relu(instance_norm(d2, 'g_d2_bn'))
+        d2 = tf.nn.relu(d2)
 
-        d2 = tf.pad(d2, [[0, 0], [3, 3], [3, 3], [0, 0]], "REFLECT")
-        pred = tf.nn.tanh(conv2d(d2, 3, 7, 1, padding='VALID', name='g_pred_c'))
+        pred = tf.nn.tanh(conv2d(d2, 3, 4, 1, padding='SAME', name='g_pred_c'))
 
         return pred
 
