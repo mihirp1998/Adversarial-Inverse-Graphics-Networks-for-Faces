@@ -12,7 +12,7 @@ def discriminator(image, options,is_training, reuse=False, name="discriminator")
             tf.get_variable_scope().reuse_variables()
         else:
             assert tf.get_variable_scope().reuse is False    
-        c1 = tf.nn.relu(instance_norm(conv2d(image, 3, 7, 1, padding='SAME', name='d_h_conv'), 'd_bn'))
+        c1 = tf.nn.relu(batch_norm(conv2d(image, 3, 7, 1, padding='SAME', name='d_h_conv'),is_training, 'd_bn'))
         h0 = lrelu(batch_norm(conv2d(c1,64, name='d_h0_conv',use_bias=False),is_training, 'd_bn0'))
         # h0 is (128 x 128 x self.df_dim)
         h1 = lrelu(batch_norm(conv2d(h0,64*2, name='d_h1_conv',use_bias=False),is_training, 'd_bn1'))
@@ -25,8 +25,9 @@ def discriminator(image, options,is_training, reuse=False, name="discriminator")
         # print(h3)
         h3_flat = tf.layers.flatten(h3,name="flatten")
 
-        logit = tf.contrib.layers.fully_connected(h3_flat,1,weights_initializer=tf.truncated_normal_initializer(stddev=0.1414))
-
+        logit = tf.layers.dense(h3_flat,1,kernel_initializer=tf.truncated_normal_initializer(stddev=0.1414))
+        logit = batch_norm(logits,is_training, 'd_bn5')
+        logit = tf.nn.relu(logit)
         return logit
 
 def generator_unet(image, options, reuse=False, name="generator"):

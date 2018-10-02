@@ -20,11 +20,17 @@ def instance_norm(input, name="instance_norm"):
         normalized = (input-mean)*inv
         return scale*normalized + offset
 
-def conv2d(input_, output_dim, ks=4, s=2, stddev=0.141, padding='SAME', name="conv2d",use_bias= True):
+# def conv2d(input_, output_dim, ks=4, s=2, stddev=0.141, padding='SAME', name="conv2d",use_bias= True):
+#     with tf.variable_scope(name):
+#         return slim.conv2d(input_, output_dim, ks, s, padding=padding, activation_fn=None,
+#                             weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
+#                             biases_initializer=None)
+
+
+def conv2d(input_, output_dim, ks=7, s=2, stddev=0.141, padding='SAME', name="conv2d",use_bias= True):
     with tf.variable_scope(name):
         return slim.conv2d(input_, output_dim, ks, s, padding=padding, activation_fn=None,
-                            weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
-                            biases_initializer=None)
+                            weights_initializer=tf.truncated_normal_initializer(stddev=stddev))
 
 def deconv2d(input_, output_dim, ks=4, s=2, stddev=0.141, name="deconv2d"):
     with tf.variable_scope(name):
