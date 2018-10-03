@@ -12,23 +12,34 @@ def discriminator(image, options,is_training, reuse=False, name="discriminator")
             tf.get_variable_scope().reuse_variables()
         else:
             assert tf.get_variable_scope().reuse is False    
-        c1 = tf.nn.relu(batch_norm(conv2d(image, 3, 7, 1, padding='SAME', name='d_h_conv'),is_training, 'd_bn'))
-        h0 = lrelu(batch_norm(conv2d(c1,64, name='d_h0_conv',use_bias=False),is_training, 'd_bn0'))
-        # h0 is (128 x 128 x self.df_dim)
-        h1 = lrelu(batch_norm(conv2d(h0,64*2, name='d_h1_conv',use_bias=False),is_training, 'd_bn1'))
-        # h1 is (64 x 64 x self.df_dim*2)
-        h2 = lrelu(batch_norm(conv2d(h1, 64*4, name='d_h2_conv',use_bias=False),is_training, 'd_bn2'))
-        # h2 is (32x 32 x self.df_dim*4)
-        h3 = lrelu(batch_norm(conv2d(h2, 64*8, name='d_h3_conv',use_bias=False),is_training, 'd_bn3'))
-        # h3 is (32 x 32 x self.df_dim*8)
-        h3 = lrelu(batch_norm(conv2d(h3, 64*8, name='d_h4_conv',use_bias=False),is_training, 'd_bn4'))
-        # print(h3)
-        h3_flat = tf.layers.flatten(h3,name="flatten")
+        # h0 = lrelu(batch_norm(conv2d(c1,64, name='d_h0_conv',use_bias=False),is_training, 'd_bn0'))
+        # # h0 is (128 x 128 x self.df_dim)
+        # h1 = lrelu(batch_norm(conv2d(h0,64*2, name='d_h1_conv',use_bias=False),is_training, 'd_bn1'))
+        # # h1 is (64 x 64 x self.df_dim*2)
+        # h2 = lrelu(batch_norm(conv2d(h1, 64*4, name='d_h2_conv',use_bias=False),is_training, 'd_bn2'))
+        # # h2 is (32x 32 x self.df_dim*4)                                        
+        # h3 = lrelu(batch_norm(conv2d(h2, 64*8, name='d_h3_conv',use_bias=False),is_training, 'd_bn3'))
+        # # h3 is (32 x 32 x self.df_dim*8)
+        # h3 = lrelu(batch_norm(conv2d(h3, 64*8, name='d_h4_conv',use_bias=False),is_training, 'd_bn4'))
+        # # print(h3)
+        # h3_flat = tf.layers.flatten(h3,name="flatten")
 
-        logit = tf.layers.dense(h3_flat,1,kernel_initializer=tf.truncated_normal_initializer(stddev=0.1414))
-        logit = batch_norm(logit,is_training, 'd_bn5')
-        logit = tf.nn.relu(logit)
-        return logit
+        h0 = lrelu(conv2dn(image, 64, name='d_h0_conv'))
+        h1 = lrelu(batch_normn(name='d_bn1')(conv2dn(h0, 64*2, name='d_h1_conv')))
+        h2 = lrelu(batch_normn(name='d_bn2')(conv2dn(h1, 64*4, name='d_h2_conv')))
+        h3 = lrelu(batch_normn(name='d_bn3')(conv2dn(h2, 64*8, name='d_h3_conv')))
+        h3 = lrelu(batch_normn(name='d_bn4')(conv2dn(h3, 64*8, name='d_h4_conv')))
+        print(h3)
+        flat = tf.layers.flatten(h3,name="flatten")
+        print(flat)
+        h4 = linear(flat, 1, 'd_h4_lin')
+
+
+
+        # logit = tf.layers.dense(h3_flat,1,kernel_initializer=tf.truncated_normal_initializer(stddev=0.1414))
+        # logit = batch_norm(logit,is_training, 'd_bn5')
+        # logit = tf.nn.relu(logit)
+        return h4
 
 def generator_unet(image, options, reuse=False, name="generator"):
 

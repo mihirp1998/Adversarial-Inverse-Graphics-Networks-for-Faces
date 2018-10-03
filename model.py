@@ -135,7 +135,7 @@ class cyclegan(object):
 
         self.d_vars = [var for var in t_vars if 'discriminator' in var.name]
         self.g_vars = [var for var in t_vars if 'generator' in var.name]
-        print("discriminator variables ",len(self.d_vars), " generator variables ",len(self.d_vars))
+        print("discriminator variables ",len(self.d_vars), " generator variables ",len(self.g_vars))
         for var in t_vars: print(var.name)
 
 
