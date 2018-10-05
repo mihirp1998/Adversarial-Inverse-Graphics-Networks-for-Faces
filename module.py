@@ -4,7 +4,7 @@ from ops import *
 from utils import *
 
 
-def discriminator(image, options,is_training, reuse=False, name="discriminator"):
+def discriminator(image,options,is_training, reuse=False, name="discriminator"):
 
     with tf.variable_scope(name):
         # image is 256 x 256 x input_c_dim
@@ -35,8 +35,7 @@ def discriminator(image, options,is_training, reuse=False, name="discriminator")
         flat = tf.layers.flatten(h3,name="flatten")
         print(flat)
         h4 = linear(flat, 1, 'd_h4_lin')
-
-
+        tf.nn.dropout(h4,0.6)
 
         # logit = tf.layers.dense(h3_flat,1,kernel_initializer=tf.truncated_normal_initializer(stddev=0.1414))
         # logit = batch_norm(logit,is_training, 'd_bn5')
