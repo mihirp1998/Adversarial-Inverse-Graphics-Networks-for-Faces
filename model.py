@@ -247,7 +247,7 @@ class Aign(object):
             print(" [!] Load failed...")
 
         # write html for visual comparison
-        index_path = os.path.join(args.test_dir, '{0}_index.html'.format(args.which_direction))
+        index_path = os.path.join(args.test_dir, 'A2B_index.html')
         index = open(index_path, "w")
         index.write("<html><body><table><tr>")
         index.write("<th>name</th><th>input</th><th>output</th></tr>")
@@ -260,7 +260,7 @@ class Aign(object):
             sample_image = np.array(sample_image).astype(np.float32)
 
             image_path = os.path.join(args.test_dir,
-                                      '{0}_{1}'.format(args.which_direction, os.path.basename(sample_file)))
+                                      'A2B_{1}'.format(os.path.basename(sample_file)))
             fake_img = self.sess.run(out_var, feed_dict={in_var: sample_image})
             save_images(fake_img, [1, 1], image_path)
             index.write("<td>%s</td>" % os.path.basename(image_path))
