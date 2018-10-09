@@ -260,7 +260,7 @@ class Aign(object):
             sample_image = np.array(sample_image).astype(np.float32)
 
             image_path = os.path.join(args.test_dir,
-                                      'A2B_{1}'.format(os.path.basename(sample_file)))
+                                      'A2B_{0}'.format(os.path.basename(sample_file)))
             fake_img = self.sess.run(out_var, feed_dict={in_var: sample_image})
             save_images(fake_img, [1, 1], image_path)
             index.write("<td>%s</td>" % os.path.basename(image_path))
