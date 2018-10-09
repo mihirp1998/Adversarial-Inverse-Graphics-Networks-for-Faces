@@ -29,9 +29,9 @@ class Aign(object):
         self.criterionGAN = sce_criterion
 
         OPTIONS = namedtuple('OPTIONS', 'batch_size image_size_A image_size_B \
-                              gf_dim df_dim output_c_dim is_training')
+                                output_c_dim is_training')
         self.options = OPTIONS._make((args.batch_size, args.load_size_A,args.load_size_B,
-                                      args.ngf, args.ndf, args.output_nc,
+                                       args.output_nc,
                                       args.phase == 'train'))
 
         self._build_model()
@@ -54,68 +54,37 @@ class Aign(object):
         self.real_B = tf.placeholder(tf.float32,
                                         [None, self.image_size_B, self.image_size_B, self.output_c_dim],
                                         name='real_A')
-        # self.real_A = self.real_data[:, :, :, :self.input_c_dim]
-        # self.real_B = self.real_data[:, :, :, self.input_c_dim:self.input_c_dim + self.output_c_dim]
+
 
         self.fake_B = self.generator(self.real_A, self.options,True, False, name="generatorA2B")
-        # self.fake_A_ = self.generator(self.fake_B, self.options, False, name="generatorB2A")
-        
-        # self.fake_A = self.generator(self.real_B, self.options, True, name="generatorB2A")
-        # self.fake_B_ = self.generator(self.fake_A, self.options, True, name="generatorA2B")
+
         self.render = self.render(self.fake_B) 
         self.DB_fake = self.discriminator(self.fake_B, self.options,True, reuse=False, name="discriminatorB")
-        # self.DA_fake = self.discriminator(self.fake_A, self.options, reuse=False, name="discriminatorA")
 
 
         self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) + self.L1_lambda * mae_criterion(self.real_A, self.render)
 
 
-        # self.g_loss_b2a = self.criterionGAN(self.DA_fake, tf.ones_like(self.DA_fake)) \
-        #     + self.L1_lambda * abs_criterion(self.real_A, self.fake_A_) \
-        #     + self.L1_lambda * abs_criterion(self.real_B, self.fake_B_)
-
-
-
-        # self.g_loss = self.criterionGAN(self.DA_fake, tf.ones_like(self.DA_fake)) \
-        #     + self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) \
-        #     + self.L1_lambda * abs_criterion(self.real_A, self.fake_A_) \
-        #     + self.L1_lambda * abs_criterion(self.real_B, self.fake_B_)
-
-
-
-        # self.fake_A_sample = tf.placeholder(tf.float32,
-        #                                     [None, self.image_size, self.image_size,
-        #                                      self.input_c_dim], name='fake_A_sample')
         self.fake_B_sample = tf.placeholder(tf.float32,
                                             [None, 128, 128,
                                              self.output_c_dim], name='fake_B_sample')
 
 
         self.DB_real = self.discriminator(self.real_B, self.options,True, reuse=True, name="discriminatorB")
-        # self.DA_real = self.discriminator(self.real_A, self.options, reuse=True, name="discriminatorA")
+
         self.DB_fake_sample = self.discriminator(self.fake_B_sample, self.options,True, reuse=True, name="discriminatorB")
-        # self.DA_fake_sample = self.discriminator(self.fake_A_sample, self.options, reuse=True, name="discriminatorA")
 
         self.db_loss_real = self.criterionGAN(self.DB_real, tf.ones_like(self.DB_real))
         self.db_loss_fake = self.criterionGAN(self.DB_fake_sample, tf.zeros_like(self.DB_fake_sample))
         self.db_loss = (self.db_loss_real + self.db_loss_fake) / 2
 
-        # self.da_loss_real = self.criterionGAN(self.DA_real, tf.ones_like(self.DA_real))
-        # self.da_loss_fake = self.criterionGAN(self.DA_fake_sample, tf.zeros_like(self.DA_fake_sample))
-        # self.da_loss = (self.da_loss_real + self.da_loss_fake) / 2
-        # self.d_loss = self.da_loss + self.db_loss
-
         self.g_loss_a2b_sum = tf.summary.scalar("g_loss_a2b", self.g_loss_a2b)
-        # self.g_loss_b2a_sum = tf.summary.scalar("g_loss_b2a", self.g_loss_b2a)
-        # self.g_loss_sum = tf.summary.scalar("g_loss", self.g_loss)
-        # self.g_sum = tf.summary.merge([self.g_loss_a2b_sum, self.g_loss_b2a_sum, self.g_loss_sum])
+
         self.db_loss_sum = tf.summary.scalar("db_loss", self.db_loss)
-        # self.da_loss_sum = tf.summary.scalar("da_loss", self.da_loss)
-        # self.d_loss_sum = tf.summary.scalar("d_loss", self.d_loss)
+
         self.db_loss_real_sum = tf.summary.scalar("db_loss_real", self.db_loss_real)
         self.db_loss_fake_sum = tf.summary.scalar("db_loss_fake", self.db_loss_fake)
-        # self.da_loss_real_sum = tf.summary.scalar("da_loss_real", self.da_loss_real)
-        # self.da_loss_fake_sum = tf.summary.scalar("da_loss_fake", self.da_loss_fake)
+
         self.d_sum = tf.summary.merge(
             [
              self.db_loss_sum, self.db_loss_real_sum, self.db_loss_fake_sum]
@@ -125,11 +94,8 @@ class Aign(object):
         self.test_A = tf.placeholder(tf.float32,
                                      [None, self.image_size_A, self.image_size_A,
                                       self.input_c_dim], name='test_A')
-        # self.test_B = tf.placeholder(tf.float32,
-        #                              [None, self.image_size, self.image_size,
-        #                               self.output_c_dim], name='test_B')
+
         self.testB = self.generator(self.test_A, self.options,False, True, name="generatorA2B")
-        # self.testA = self.generator(self.test_B, self.options, True, name="generatorB2A")
 
         t_vars = tf.trainable_variables()
 
@@ -141,7 +107,7 @@ class Aign(object):
 
 
     def train(self, args):
-        """Train cyclegan"""
+
         self.lr = tf.placeholder(tf.float32, None, name='learning_rate')
         
         self.d_optim = tf.train.AdamOptimizer(self.lr, beta1=args.beta1) \
@@ -185,7 +151,6 @@ class Aign(object):
 
                 batch_images_B = np.array(batch_images_B).astype(np.float32)
 
-                # Update G network and record fake outputs
                 fake_B, _, summary_str_G,gen_loss = self.sess.run(
                     [self.fake_B, self.g_optim, self.g_loss_a2b_sum, self.g_loss_a2b ],
                     feed_dict={self.real_A: batch_images_A,self.real_B: batch_images_B, self.lr: lr})
@@ -194,7 +159,6 @@ class Aign(object):
 
                 [fake_B] = self.pool([fake_B])
 
-                # Update D network
                 _, summary_str_D,dis_loss = self.sess.run(
                     [self.d_optim, self.d_sum,self.db_loss],
                     feed_dict={self.real_A: batch_images_A,self.real_B: batch_images_B,
@@ -211,14 +175,14 @@ class Aign(object):
                     self.sample_model(args.sample_dir, epoch, idx)
                     print(("Epoch: [%2d] [%4d/%4d] time: %4.4f" % (epoch, idx, batch_idxs, time.time() - start_time)))
                     print("Gen Loss ",gen_loss," Dis Loss ",dis_loss)
-                    # print(summary_str_G,summary_str_D)
+
                 if np.mod(counter, args.save_freq) == 2:
                     self.save(args.checkpoint_dir, counter)
 
 
 
     def save(self, checkpoint_dir, step):
-        model_name = "cyclegan.model"
+        model_name = "aign.model"
         model_dir = "%s_%s" % (self.dataset_dir, self.image_size_A)
         checkpoint_dir = os.path.join(checkpoint_dir, model_dir)
 
@@ -251,12 +215,10 @@ class Aign(object):
         dataB = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/trainB'))
         np.random.shuffle(dataA)
         np.random.shuffle(dataB)
-        # print(len(dataA))
-        # idx = idx%min(len(dataA),len(dataB))
-        # print(idx)
+
         batch_files_A = list(dataA[:self.batch_size])
         batch_files_B = list(dataB[:self.batch_size])
-        # print(batch_files_A)
+
         batch_images_A = [load_train_data(batch_file, self.image_size_A ) for batch_file in batch_files_A]
 
         batch_images_B = [load_train_data(batch_file,self.image_size_B) for batch_file in batch_files_B]
@@ -265,34 +227,19 @@ class Aign(object):
 
         sample_images_B = np.array(batch_images_B).astype(np.float32)
 
-
-
-        # print("sampleing ",sample_images_A.shape)
         [fake_B] = self.sess.run([self.testB], feed_dict = {self.test_A: sample_images_A})
 
-
-        # save_images(fake_A, [self.batch_size, 1],
-        #             './{}/A_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
         save_images(fake_B, [self.batch_size, 1],
                     '{}/B_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
-        # save_images(real_B, [self.batch_size, 1],
-        #             '{}/B_Real_{:04d}.jpg'.format(sample_dir, idx))
-
 
 
     def test(self, args):
-        """Test cyclegan"""
+
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
 
         sample_files = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/testA'))
 
-        # if args.which_direction == 'AtoB':
-        #     sample_files = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/testA'))
-        # # elif args.which_direction == 'BtoA':
-        #     sample_files = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/testB'))
-        # else:
-        #     raise Exception('--which_direction must be AtoB or BtoA')
 
         if self.load(args.checkpoint_dir):
             print(" [*] Load SUCCESS")
