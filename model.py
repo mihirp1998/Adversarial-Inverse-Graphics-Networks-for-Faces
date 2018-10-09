@@ -10,7 +10,7 @@ from module import *
 from utils import *
 
 
-class cyclegan(object):
+class Aign(object):
     def __init__(self, sess, args):
         self.sess = sess
         self.batch_size = args.batch_size

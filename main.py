@@ -2,7 +2,7 @@ import argparse
 import os
 import tensorflow as tf
 tf.set_random_seed(19)
-from model import cyclegan
+from model import Aign
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--dataset_dir', dest='dataset_dir', default='horse2zebra', help='path of the dataset')
@@ -47,7 +47,7 @@ def main(_):
     tfconfig = tf.ConfigProto(allow_soft_placement=True)
     tfconfig.gpu_options.allow_growth = True
     with tf.Session(config=tfconfig) as sess:
-        model = cyclegan(sess, args)
+        model = Aign(sess, args)
         model.train(args) if args.phase == 'train' \
             else model.test(args)
 
