@@ -309,8 +309,9 @@ class Aign(object):
 
         for sample_file in sample_files:
             print('Processing image: ' + sample_file)
-            sample_image = [load_test_data(sample_file, args.fine_size)]
+            sample_image = [load_test_data(sample_file, self.image_size_A )]
             sample_image = np.array(sample_image).astype(np.float32)
+
             image_path = os.path.join(args.test_dir,
                                       '{0}_{1}'.format(args.which_direction, os.path.basename(sample_file)))
             fake_img = self.sess.run(out_var, feed_dict={in_var: sample_image})
