@@ -2,7 +2,7 @@
 Open source Implementation of Adversarial Inverse Graphics Network Biased SuperResolution for Image Translation
 ## Introduction
 
-The following is an Unofficial implementation of [Adversarial Inverse Graphics Network ](https://arxiv.org/pdf/1801.00508.pdf) by Chris Ying and Katerina Fragkiadaki. 
+The following is an Unofficial implementation of [Adversarial Inverse Graphics Network ](https://arxiv.org/abs/1705.11166) by Hsiao-Yu Fish Tung, Adam W. Harley, William Seto, Katerina Fragkiadaki. 
 
 The folllowing topics are covered :
 - [x] **Data-Preprocessing**. Images are transformed in the range of -1 to 1
