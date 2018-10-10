@@ -7,8 +7,7 @@ dataB = glob('./datasets/{}/*.*'.format("ppl2avatar" + '/trainB'))
 np.random.shuffle(dataA)
 np.random.shuffle(dataB)
 # print(len(dataA))
-# idx = idx%min(len(dataA),len(dataB))
-# print(idx)
+
 batch_files_A = list(dataA[:2])
 batch_files_B = list(dataB[:2])
 # print(batch_files_A)
@@ -25,14 +24,7 @@ real_B = sample_images_B
 import cv2
 cv2.imshow('image',(real_B[0]+1)/2)
 cv2.waitKey(0)
-# print("sampleing ",sample_images_A.shape)
-# [fake_B,real_B] = self.sess.run([self.fake_B,self.real_B], feed_dict = {self.real_A: sample_images_A,self.real_B: sample_images_B})
 
-
-# save_images(fake_A, [self.batch_size, 1],
-#             './{}/A_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
-# save_images(fake_B, [self.batch_size, 1],
-#             '{}/B_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
 save_images(real_B, [2, 1],
             '{}/B_Real_Check_{:04d}.jpg'.format("sample", 9))
 

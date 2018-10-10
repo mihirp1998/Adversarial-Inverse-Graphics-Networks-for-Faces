@@ -20,11 +20,7 @@ def instance_norm(input, name="instance_norm"):
         normalized = (input-mean)*inv
         return scale*normalized + offset
 
-# def conv2d(input_, output_dim, ks=4, s=2, stddev=0.141, padding='SAME', name="conv2d",use_bias= True):
-#     with tf.variable_scope(name):
-#         return slim.conv2d(input_, output_dim, ks, s, padding=padding, activation_fn=None,
-#                             weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
-#                             biases_initializer=None)
+
 
 
 def conv2d(input_, output_dim, ks=7, s=2, stddev=0.141, padding='SAME', name="conv2d",use_bias= True):
@@ -44,7 +40,7 @@ def conv2dn(input_, output_dim,
     # conv = tf.reshape(tf.nn.bias_add(conv, biases), conv.get_shape())
     # print("before bias",conv)
     conv = tf.nn.bias_add(conv, biases)
-    # print("after bias",conv)
+    
     return conv
 
 def linear(input_, output_size, scope=None, stddev=0.02, bias_start=0.0, with_w=False):
@@ -111,15 +107,3 @@ class batch_normn(object):
                       epsilon=self.epsilon,
                       scale=True,
                       is_training=train,scope=self.name)    
-
-# def linear(input_, output_size, scope=None, stddev=0.141, bias_start=0.0, with_w=False):
-
-#     with tf.variable_scope(scope or "Linear"):
-#         matrix = tf.get_variable("Matrix", [input_.get_shape()[-1], output_size], tf.float32,
-#                                  tf.random_normal_initializer(stddev=stddev))
-#         bias = tf.get_variable("bias", [output_size],
-#             initializer=tf.constant_initializer(bias_start))
-#         if with_w:
-#             return tf.matmul(input_, matrix) + bias, matrix, bias
-#         else:
-#             return tf.matmul(input_, matrix) + bias

@@ -23,8 +23,7 @@ class Aign(object):
 
         self.discriminator = discriminator
         self.generator = generator_resnet
-        # else:
-        #     self.generator = generator_unet
+
 
         self.criterionGAN = sce_criterion
 
