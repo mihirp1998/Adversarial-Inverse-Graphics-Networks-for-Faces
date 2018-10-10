@@ -18,13 +18,16 @@ class Aign(object):
         self.image_size_B = args.load_size_B
         self.input_c_dim = args.input_nc
         self.output_c_dim = args.output_nc
+
+        # ratio between rendered loss and gan loss
+        # change the value dependent on the data
         self.L1_lambda = args.L1_lambda
         self.dataset_dir = args.dataset_dir
 
         self.discriminator = discriminator
         self.generator = generator_resnet
 
-
+        # softmax cross entropy
         self.criterionGAN = sce_criterion
 
         OPTIONS = namedtuple('OPTIONS', 'batch_size image_size_A image_size_B \
@@ -40,6 +43,8 @@ class Aign(object):
 
 
     def render(self,image):
+        # renderer for image translation
+        # change the function dependent upon the use
         rendered = tf.layers.average_pooling2d(image,6,4,padding='same')
         return rendered
 
@@ -54,16 +59,18 @@ class Aign(object):
                                         [None, self.image_size_B, self.image_size_B, self.output_c_dim],
                                         name='real_A')
 
-
+        # fake image
         self.fake_B = self.generator(self.real_A, self.options,True, False, name="generatorA2B")
 
+        # rendered image
         self.render = self.render(self.fake_B) 
+        # discriminator for b
         self.DB_fake = self.discriminator(self.fake_B, self.options,True, reuse=False, name="discriminatorB")
 
-
+        # loss with cross entropy and mean squared error
         self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) + self.L1_lambda * mae_criterion(self.real_A, self.render)
 
-
+        # testing
         self.fake_B_sample = tf.placeholder(tf.float32,
                                             [None, 128, 128,
                                              self.output_c_dim], name='fake_B_sample')
@@ -72,9 +79,11 @@ class Aign(object):
         self.DB_real = self.discriminator(self.real_B, self.options,True, reuse=True, name="discriminatorB")
 
         self.DB_fake_sample = self.discriminator(self.fake_B_sample, self.options,True, reuse=True, name="discriminatorB")
-
+        # real discrimiator loss
         self.db_loss_real = self.criterionGAN(self.DB_real, tf.ones_like(self.DB_real))
+        # fake discrim loss
         self.db_loss_fake = self.criterionGAN(self.DB_fake_sample, tf.zeros_like(self.DB_fake_sample))
+        # total loss
         self.db_loss = (self.db_loss_real + self.db_loss_fake) / 2
 
         self.g_loss_a2b_sum = tf.summary.scalar("g_loss_a2b", self.g_loss_a2b)
