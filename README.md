@@ -16,8 +16,7 @@ The folllowing topics are covered :
 ## Dataset
 **The dataset has been collected by me by applying a face cropper on all Avatar Movie frames 
 The human dataset is taken from Celeb Data**
-*Download it from here and add it to the *datasets* folder*
-*trainA represents from part of Translation and trainB represents *TO* part*
+*trainA represents *FROM* part of Translation and trainB represents *TO* part*
 ```bash
 unzip ppl2avatar.zip
 cp -r ppl2avatar datasets/
