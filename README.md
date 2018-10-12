@@ -1,5 +1,7 @@
 # AIGN for Image Translation 
 Open source Implementation of Adversarial Inverse Graphics Network Biased SuperResolution for Image Translation
+
+ <img src="results/bestAvatar2human.jpg" width="700"> 
 ## Introduction
 
 The following is an Unofficial implementation of [Adversarial Inverse Graphics Network ](https://arxiv.org/abs/1705.11166) by Hsiao-Yu Fish Tung, Adam W. Harley, William Seto, Katerina Fragkiadaki. 
@@ -50,6 +52,6 @@ python main.py --dataset_dir ppl2avatar/ --phase test
  
   <img src="results/avatar2humancollage.jpg" width="1300"> 
 
- <img src="results/bestAvatar2human.jpg" width="300"> 
+
 
 
