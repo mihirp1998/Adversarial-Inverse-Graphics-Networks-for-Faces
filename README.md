@@ -33,7 +33,7 @@ pip install -r requirements.txt
  **Train Biased SuperResolution AIGN Model**
  *Change the value of lambda dependent on the bias* 
  ```bash
-python main.py --dataset_dir ppl2avatar  --L1_lambda 0.05  --lr 0.0001 --continue_train True
+python main.py --dataset_dir ppl2avatar --lr 0.0001 --continue_train True
 
 ``` 
 
@@ -46,8 +46,10 @@ python main.py --dataset_dir ppl2avatar/ --phase test
 ``` 
 ## Results
 
+ <img src="results/human2avatarcollage.jpg" width="1300"> 
  
+  <img src="results/avatar2humancollage.jpg" width="1300"> 
 
-
+ <img src="results/bestAvatar2human.jpg" width="300"> 
 
 
