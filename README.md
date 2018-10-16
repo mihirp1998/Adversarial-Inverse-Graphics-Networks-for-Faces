@@ -15,7 +15,7 @@ The folllowing topics are covered :
 
 ## Renderer
 
-Change the Render Function dependent on your Need. The renderer is the one which adds bias to the network. I have currently kept it according to biased SuperResolution as mentioned in Paper but dependent on the data you have to change it. For Avatar to Human I convert the rendered Image to GrayScale
+Change the Render Function dependent on your Need. The renderer is the one which adds bias to the network. I have currently kept it according to biased SuperResolution as mentioned in Paper but dependent on the data you have to change it. For Avatar to Human I converted the rendered Image to GrayScale
 
 ## Dataset
 **The dataset has been collected by me by applying a face cropper on all Avatar Movie frames 
