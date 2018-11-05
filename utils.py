@@ -52,8 +52,8 @@ def load_train_data(image_path, load_size=32, is_testing=False):
         img_A = scipy.misc.imresize(img_A, [load_size, load_size])
 
 
-        if np.random.random() > 0.5:
-            img_A = np.fliplr(img_A)
+        # if np.random.random() > 0.5:
+        #     img_A = np.fliplr(img_A)
 
     else:
 
@@ -116,5 +116,4 @@ def transform(image, npx=64, is_crop=True, resize_w=64):
     return np.array(cropped_image)/127.5 - 1.
 
 def inverse_transform(images):
-    print("images shape ",images.shape)
     return (images+1.)/2.

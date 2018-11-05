@@ -46,6 +46,7 @@ class Aign(object):
         # renderer for image translation
         # change the function dependent upon the use
         rendered = tf.layers.average_pooling2d(image,6,4,padding='same')
+        rendered = tf.image.rgb_to_grayscale(rendered)
         return rendered
 
     def _build_model(self):
@@ -63,12 +64,12 @@ class Aign(object):
         self.fake_B = self.generator(self.real_A, self.options,True, False, name="generatorA2B")
 
         # rendered image
-        self.render = self.render(self.fake_B) 
+        self.rendered = self.render(self.fake_B) 
         # discriminator for b
         self.DB_fake = self.discriminator(self.fake_B, self.options,True, reuse=False, name="discriminatorB")
-
+        self.realA_Gray = tf.image.rgb_to_grayscale(self.real_A)
         # loss with cross entropy and mean squared error
-        self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) + self.L1_lambda * mae_criterion(self.real_A, self.render)
+        self.g_loss_a2b = self.criterionGAN(self.DB_fake, tf.ones_like(self.DB_fake)) + self.L1_lambda * mae_criterion(self.realA_Gray , self.rendered)
 
         # testing
         self.fake_B_sample = tf.placeholder(tf.float32,
@@ -104,7 +105,8 @@ class Aign(object):
                                       self.input_c_dim], name='test_A')
 
         self.testB = self.generator(self.test_A, self.options,False, True, name="generatorA2B")
-
+        self.renderTest = self.render(self.testB) 
+        self.testRealA = tf.image.rgb_to_grayscale(self.test_A)
         t_vars = tf.trainable_variables()
 
         self.d_vars = [var for var in t_vars if 'discriminator' in var.name]
@@ -220,25 +222,35 @@ class Aign(object):
 
     def sample_model(self, sample_dir, epoch, idx):
         dataA = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/trainA'))
-        dataB = glob('./datasets/{}/*.*'.format(self.dataset_dir + '/trainB'))
-        np.random.shuffle(dataA)
-        np.random.shuffle(dataB)
 
-        batch_files_A = list(dataA[:self.batch_size])
-        batch_files_B = list(dataB[:self.batch_size])
+        np.random.shuffle(dataA)
+
+
+        batch_files_A = list(dataA[:10])
+
 
         batch_images_A = [load_train_data(batch_file, self.image_size_A ) for batch_file in batch_files_A]
-
-        batch_images_B = [load_train_data(batch_file,self.image_size_B) for batch_file in batch_files_B]
+        batch_images_A_128 = [load_train_data(batch_file, 128) for batch_file in batch_files_A]
 
         sample_images_A = np.array(batch_images_A).astype(np.float32)
 
-        sample_images_B = np.array(batch_images_B).astype(np.float32)
+        sample_images_A_128 = np.array(batch_images_A_128).astype(np.float32)
 
+        # [fake_B,realA_Gray,render] = self.sess.run([self.testB,self.renderTest ,self.testRealA], feed_dict = {self.test_A: sample_images_A})
         [fake_B] = self.sess.run([self.testB], feed_dict = {self.test_A: sample_images_A})
 
-        save_images(fake_B, [self.batch_size, 1],
+        merged = np.concatenate([fake_B,sample_images_A_128],axis =2)
+
+
+
+        save_images(merged, [10, 1],
                     '{}/B_{:02d}_{:04d}.jpg'.format(sample_dir, epoch, idx))
+
+        # merged2 = np.concatenate([realA_Gray,render],axis =2)
+
+        # save_images(merged2, [10, 1],
+        #             '{}/B_{:02d}_{:04d}new.jpg'.format(sample_dir, epoch, idx))
+
 
 
     def test(self, args):

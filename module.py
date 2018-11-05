@@ -32,11 +32,11 @@ def discriminator(image,options,is_training, reuse=False, name="discriminator"):
         flat = tf.layers.flatten(h4,name="flatten")
          # flat is (8192)
 
-        dflat = tf.nn.dropout(flat,0.5)
+        flat = tf.nn.dropout(flat,0.5)
 
          # dropout (4096)
           
-        pred = linear(dflat, 1, 'd_h4_lin')
+        pred = linear(flat, 1, 'd_h4_lin')
          # pred (1) 
 
         return pred
