@@ -1,2 +1,3 @@
    hello world 
-![](out.gif)
+
+ <img src="out.gif" width="700"> 
