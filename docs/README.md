@@ -1,5 +1,5 @@
 ## Abstract
-Researchers have developed excellent feed-forward
+<font size="6">Researchers have developed excellent feed-forward
 models that learn to map images to desired outputs, such as
 to the images’ latent factors, or to other images, using supervised
 learning. Learning such mappings from unlabelled
@@ -22,5 +22,5 @@ seamlessly incorporates such biases, rendering input faces
 towards young, old, feminine, masculine or Tom Cruiselike
 equivalents (depending on the chosen bias), or adding
 lip and nose augmentations while inpainting concealed lips
-and noses.
+and noses.</font>
  <img src="out.gif" width="300"> 
