@@ -1,5 +1,5 @@
 ## Abstract
-<p  style="font-size:10%;">Researchers have developed excellent feed-forward
+<p  style="font-size:70%;">Researchers have developed excellent feed-forward
 models that learn to map images to desired outputs, such as
 to the images’ latent factors, or to other images, using supervised
 learning. Learning such mappings from unlabelled
