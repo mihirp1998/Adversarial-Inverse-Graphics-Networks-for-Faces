@@ -23,4 +23,18 @@ towards young, old, feminine, masculine or Tom Cruiselike
 equivalents (depending on the chosen bias), or adding
 lip and nose augmentations while inpainting concealed lips
 and noses.</p>
- <img src="out.gif" width="300"> 
+
+## Renderer
+
+The most important part of an AIGN network is its Renderer. The renderer in this paper is a non parameteric decoder which needs to be hand engineered dependent on the use-case.
+As mentioned in the paper the renderer used by the authors for face translation is a 4:1 Average Pooling Network.
+
+For few specific cases I have extended the renderer to a Gray Scale Average Pooling Network, which results in good results for  Human to Avatar and Black Hair to Blonde Hair as in the previous renderer a color change affects the network negatively 
+
+## Learning Transistion
+
+<img src="out.gif" width="300"> 
+
+
+## Results
+
