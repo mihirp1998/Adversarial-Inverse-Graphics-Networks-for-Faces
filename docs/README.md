@@ -1,3 +1,3 @@
    hello world 
 
- <img src="out.gif" width="700"> 
+ <img src="out.gif" width="300"> 
