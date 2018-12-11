@@ -33,7 +33,7 @@ For few specific cases I have extended the renderer to a Gray Scale Average Pool
 
 ## Learning Transistion
 
-<img src="out.gif" width="300"> 
+<img src="out.gif" width="300" style="margin: 0 auto;"> 
 
 
 ## Results
