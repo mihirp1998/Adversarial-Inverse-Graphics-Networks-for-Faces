@@ -26,13 +26,13 @@ and noses.</p>
 
 ## Renderer
 
-<p>The most important part of an AIGN network is its Renderer. The renderer in this paper is a non parameteric decoder which needs to be hand engineered dependent on the use-case.
+<p  style="font-size:80%;">The most important part of an AIGN network is its Renderer. The renderer in this paper is a non parameteric decoder which needs to be hand engineered dependent on the use-case.
 As mentioned in the paper the renderer used by the authors for face translation is a 4:1 Average Pooling Network.</p>
 
 
 <img src="down_sample.png" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
 
-<p>For few specific cases I have extended the renderer to a Gray Scale Average Pooling Network, which results in good results for  Human to Avatar and Black Hair to Blonde Hair as in the previous renderer a color change affects the network negatively</p>
+<p  style="font-size:80%;">For few specific cases I have extended the renderer to a Gray Scale Average Pooling Network, which results in good results for  Human to Avatar and Black Hair to Blonde Hair as in the previous renderer a color change affects the network negatively</p>
 
 
 <img src="grayscale_diag.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
