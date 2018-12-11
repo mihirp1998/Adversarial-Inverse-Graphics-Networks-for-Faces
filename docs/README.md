@@ -37,16 +37,16 @@ For few specific cases I have extended the renderer to a Gray Scale Average Pool
 ## Results
 <div>
     <img src="finalcollage/best_female.jpg" width="300" style="display: inline-block;margin-right:20%">
-    <img src="finalcollage/best_bald.jpg" width="300" style="display: inline-block;">
+    <img src="finalcollage/best_bald.jpg" width="300" style="display: inline-block;;margin-top:5%">
 </div>
 <div>
     <img src="finalcollage/best_male.jpg" width="300" style="display: inline-block;margin-right:20%;margin-top:5%;">
     <img src="finalcollage/best_bald.jpg" width="300" style="display: inline-block;margin-top:5%">
 </div>
-<img src="finalcollage/best_noglasses.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;">
-    <img src="finalcollage/best_smiling.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;">
-    <img src="finalcollage/best_young.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;">
+<img src="finalcollage/best_noglasses.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
+    <img src="finalcollage/best_smiling.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
+    <img src="finalcollage/best_young.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
     
-<img src="finalcollage/best_avatar.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;">
+<img src="finalcollage/best_avatar.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
 
 
