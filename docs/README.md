@@ -26,14 +26,22 @@ and noses.</p>
 
 ## Renderer
 
-The most important part of an AIGN network is its Renderer. The renderer in this paper is a non parameteric decoder which needs to be hand engineered dependent on the use-case.
-As mentioned in the paper the renderer used by the authors for face translation is a 4:1 Average Pooling Network.
+<p  style="font-size:80%;">The most important part of an AIGN network is its Renderer. The renderer in this paper is a non parameteric decoder which needs to be hand engineered dependent on the use-case.
+As mentioned in the paper the renderer used by the authors for face translation is a 4:1 Average Pooling Network.</p>
 
-For few specific cases I have extended the renderer to a Gray Scale Average Pooling Network, which results in good results for  Human to Avatar and Black Hair to Blonde Hair as in the previous renderer a color change affects the network negatively 
+
+<img src="down_sample.png" width="450" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
+
+<p  style="font-size:80%;">For few specific cases I have extended the renderer to a Gray Scale Average Pooling Network, which results in good results for  Human to Avatar and Black Hair to Blonde Hair as in the previous renderer a color change affects the network negatively</p>
+
+
+<img src="grayscale_diag.jpg" width="600" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
+
 
 ## Learning Transistion
-<p style="text-align: center;">Human to Avatar</p>
-<img src="out.gif" width="300" style="display: block;margin-left:auto;margin-right: auto;">
+<p style="text-align: center;">Old to Young</p>
+
+<img src="youngslow.gif" width="300" style="display: block;margin-left:auto;margin-right: auto;">
 
 ## Results
 <div>
@@ -50,4 +58,6 @@ For few specific cases I have extended the renderer to a Gray Scale Average Pool
     
 <img src="finalcollage/best_avatar.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
 
+## Information
 
+[AIGN Paper](https://arxiv.org/abs/1705.11166)| [AIGN Code](https://github.com/mihirp1998/Adversarial-Inverse-Graphics-Networks-for-Faces)
