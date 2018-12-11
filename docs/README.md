@@ -33,7 +33,7 @@ For few specific cases I have extended the renderer to a Gray Scale Average Pool
 
 ## Learning Transistion
 <p style="text-align: center;">Human to Avatar</p>
-<img src="out.gif" width="500" style="display: block;margin-left:auto;margin-right: auto;">
+<img src="out.gif" width="300" style="display: block;margin-left:auto;margin-right: auto;">
 ## Results
 <div>
     <img src="finalcollage/best_female.jpg" width="300" style="display: inline-block;margin-right:20%">
