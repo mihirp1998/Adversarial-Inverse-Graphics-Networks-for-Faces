@@ -50,7 +50,7 @@ As mentioned in the paper the renderer used by the authors for face translation 
 </div>
 <div>
     <img src="finalcollage/best_male.jpg" width="300" style="display: inline-block;margin-right:20%;margin-top:5%;">
-    <img src="finalcollage/best_bald.jpg" width="300" style="display: inline-block;margin-top:5%">
+    <img src="best_blonde.jpg" width="300" style="display: inline-block;margin-top:5%">
 </div>
 <img src="finalcollage/best_noglasses.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
     <img src="finalcollage/best_smiling.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
