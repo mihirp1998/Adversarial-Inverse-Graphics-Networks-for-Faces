@@ -35,7 +35,7 @@ As mentioned in the paper the renderer used by the authors for face translation 
 <p  style="font-size:80%;">For few specific cases I have extended the renderer to a Gray Scale Average Pooling Network, which results in good results for  Human to Avatar and Black Hair to Blonde Hair as in the previous renderer a color change affects the network negatively</p>
 
 
-<img src="grayscale_diag.jpg" width="500" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
+<img src="grayscale_diag.jpg" width="600" style="display: block;margin-left:auto;margin-right: auto;;margin-top:5%">
 
 
 ## Learning Transistion
