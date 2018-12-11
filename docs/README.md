@@ -40,6 +40,7 @@ As mentioned in the paper the renderer used by the authors for face translation 
 
 ## Learning Transistion
 <p style="text-align: center;">Human to Avatar</p>
+
 <img src="out.gif" width="300" style="display: block;margin-left:auto;margin-right: auto;">
 
 ## Results
