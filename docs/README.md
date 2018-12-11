@@ -60,5 +60,4 @@ As mentioned in the paper the renderer used by the authors for face translation 
 
 ## Information
 
-<a href="https://arxiv.org/abs/1705.11166"><b style="font-size:120%;">AIGN Paper</b></a>
 [AIGN Paper](https://arxiv.org/abs/1705.11166)| [AIGN Code](https://github.com/mihirp1998/Adversarial-Inverse-Graphics-Networks-for-Faces)
