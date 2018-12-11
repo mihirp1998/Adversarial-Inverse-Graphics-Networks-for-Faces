@@ -41,7 +41,7 @@ For few specific cases I have extended the renderer to a Gray Scale Average Pool
 </div>
 <div>
     <img src="finalcollage/best_male.jpg" width="300" style="display: inline-block;margin-right:20%">
-    <img src="finalcollage/best_bald.jpg" width="300" style="display: inline-block;margin-right:20%">
+    <img src="finalcollage/best_bald.jpg" width="300" style="display: inline-block">
 </div>
 <img src="finalcollage/best_noglasses.jpg" width="300" style="display: block;margin-left:auto;margin-right: auto;">
     <img src="finalcollage/best_smiling.jpg" width="300" style="display: block;margin-left:auto;margin-right: auto;">
