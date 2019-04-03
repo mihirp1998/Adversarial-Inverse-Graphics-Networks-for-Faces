@@ -1,4 +1,4 @@
-the code isn't well structured at all.. 
+the code is isolated from the other code also it isn't well structured at all.. 
 But you guys can use the specific python files to run the version of dataset that you are using for faces..
 there isn't a global config file right now.. so u would have to manually change the dataset directory within the python file
 
