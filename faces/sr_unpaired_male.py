@@ -99,7 +99,7 @@ class batch_norm(object):
                                     initializer=tf.random_normal_initializer(1., 0.02))
 
                 # work around reuse=True problem
-                with tf.variable_scope(tf.get_variable_scope(), reuse=False):
+                with tf.variable_scope(tf.get_variable_scope(), reuse=tf.AUTO_REUSE):
                     batch_mean, batch_var = tf.nn.moments(x, [0, 1, 2], name='moments')
                     ema_apply_op = self.ema.apply([batch_mean, batch_var])
                     self.ema_mean, self.ema_var = self.ema.average(batch_mean), self.ema.average(batch_var)
@@ -332,8 +332,8 @@ print "initialization done"
 # TRAINING
 ############
 
-female_data_dir = '/home/wseto/datasets/celeba_female'
-male_data_dir = '/home/wseto/datasets/celeba_male'
+young_data_dir = '~/datasets/celebA/celeba_young'
+old_data_dir = '~/datasets/celebA/celeba_young'
 
 female_data = glob(os.path.join(female_data_dir, "*.png"))
 male_data = glob(os.path.join(male_data_dir, "*.png"))

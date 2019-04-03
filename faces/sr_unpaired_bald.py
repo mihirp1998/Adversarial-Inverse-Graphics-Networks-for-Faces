@@ -318,8 +318,8 @@ ups_PSNR = tf.summary.scalar("ups_PSNR_HR", ups_PSNR)
 
 merged_summary_train = tf.summary.merge([d_loss_train, g_L2LR_train, g_loss_adv_train, g_L2HR_train, g_PSNR_train, ups_L2HR, ups_PSNR])
 merged_summary_test = tf.summary.merge([g_L2LR_test, g_L2HR_test, g_PSNR_test, ups_L2HR, ups_PSNR])
-train_writer = tf.summary.FileWriter('./logs_male/train')
-test_writer = tf.summary.FileWriter('./logs_male/test')
+train_writer = tf.summary.FileWriter('./logs_blonde/train')
+test_writer = tf.summary.FileWriter('./logs_blonde/test')
 
 
 
@@ -330,9 +330,9 @@ print "initialization done"
 # TRAINING
 ############
 # to
-female_data_dir = '/home_01/f20150198/datasets/celebA/celeba_male'
+female_data_dir = '/home_01/f20150198/datasets/celebA/celeba_blond'
 # from
-male_data_dir = '/home_01/f20150198/datasets/celebA/celeba_female'
+male_data_dir = '/home_01/f20150198/datasets/celebA/celeba_blackhair'
 
 
 female_data = glob(os.path.join(female_data_dir, "*.png"))
@@ -362,11 +362,11 @@ print "data disc:", len(data_disc)
 print "data sample:", len(data_sample)
 
 # create directories to save checkpoint and samples
-samples_dir = 'samples_male'
+samples_dir = 'samples_blonde'
 if not os.path.exists(samples_dir):
     os.makedirs(samples_dir)
 
-checkpoint_dir = 'checkpoint_male'
+checkpoint_dir = 'checkpoint_blonde'
 if not os.path.exists(checkpoint_dir):
     os.makedirs(checkpoint_dir)
 
@@ -378,7 +378,7 @@ start_time = time.time()
 counter = 0
 
 b_load = True
-ckpt_dir = 'checkpoint_male'
+ckpt_dir = 'checkpoint_blonde'
 
 with tf.Session() as sess:
     tf.global_variables_initializer().run()

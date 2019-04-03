@@ -12,6 +12,8 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 from PIL import Image
 import pdb
+import pandas as pd 
+import cv2
 
 def print_shape(t):
     print(t.name, t.get_shape().as_list())
@@ -33,7 +35,7 @@ def optimistic_restore(session, save_file, graph=tf.get_default_graph()):
 # takes list of filenames and returns a 4D batch of images
 # [N x W x H x C]
 # also resize if necessary
-def get_images(filenames, imsize=None):
+def get_images(filenames, imsize=None,val =1):
 
     if imsize:
         batch_orig = [imresize(imread(path), (imsize, imsize), interp='bicubic') for path in filenames]
@@ -45,7 +47,7 @@ def get_images(filenames, imsize=None):
     batch_inputs = [imresize(im, 0.25, interp='bicubic') for im in batch_orig]
     # imresize returns in [0-255] so we have to normalize again
     batch_inputs_normed = np.array(batch_inputs).astype(np.float32)/127.5-1
-
+    batch_orig_normed = [imresize(im, val, interp='bicubic') for im in batch_orig_normed]
     return batch_orig_normed, batch_inputs_normed
 
 def lrelu(x, leak=0.2, name="lrelu"):
@@ -122,7 +124,7 @@ class batch_norm(object):
 adam_learning_rate = 0.0001
 adam_beta1 = 0.9
 
-batch_size = 32
+batch_size = 1
 image_h = 128
 image_w = 128
 
@@ -318,8 +320,6 @@ ups_PSNR = tf.summary.scalar("ups_PSNR_HR", ups_PSNR)
 
 merged_summary_train = tf.summary.merge([d_loss_train, g_L2LR_train, g_loss_adv_train, g_L2HR_train, g_PSNR_train, ups_L2HR, ups_PSNR])
 merged_summary_test = tf.summary.merge([g_L2LR_test, g_L2HR_test, g_PSNR_test, ups_L2HR, ups_PSNR])
-train_writer = tf.summary.FileWriter('./logs_male/train')
-test_writer = tf.summary.FileWriter('./logs_male/test')
 
 
 
@@ -330,45 +330,27 @@ print "initialization done"
 # TRAINING
 ############
 # to
-female_data_dir = '/home_01/f20150198/datasets/celebA/celeba_male'
+
 # from
-male_data_dir = '/home_01/f20150198/datasets/celebA/celeba_female'
+male_data_dir = '/home_01/f20150198/datasets/celebA/celeba_blackhair/'
 
 
-female_data = glob(os.path.join(female_data_dir, "*.png"))
+
 male_data = glob(os.path.join(male_data_dir, "*.png"))
 
-data_disc, female_data_nondisc = train_test_split(female_data, test_size=0.5, random_state=42)
-
-female_data_train, female_data_sample = train_test_split(female_data_nondisc, test_size=0.9, random_state=42)
-male_data_train, male_data_sample = train_test_split(male_data, test_size=0.1, random_state=42)
-data_train = female_data_train + male_data_train
-data_sample =  male_data_sample
+data_sample = male_data
 
 
-# # to these images --> data_disc 
-# data_disc, female_data_nondisc = train_test_split(female_data, test_size=0.1, random_state=42)
-
-# # female_data_train, female_data_sample = train_test_split(female_data_nondisc, test_size=0.1, random_state=42)
-# male_data_train, male_data_sample = train_test_split(male_data, test_size=0.1, random_state=42)
-
-# # from these images--> data_train
-# data_train =  male_data_train
-# data_sample =  male_data_sample
-
-
-print "data train:", len(data_train)
-print "data disc:", len(data_disc)
 print "data sample:", len(data_sample)
 
 # create directories to save checkpoint and samples
-samples_dir = 'samples_male'
+samples_dir = 'result_blonde'
 if not os.path.exists(samples_dir):
     os.makedirs(samples_dir)
 
-checkpoint_dir = 'checkpoint_male'
-if not os.path.exists(checkpoint_dir):
-    os.makedirs(checkpoint_dir)
+# checkpoint_dir = 'checkpoint_smiling'
+# if not os.path.exists(checkpoint_dir):
+#     os.makedirs(checkpoint_dir)
 
 
 print "TRAINING"
@@ -378,85 +360,87 @@ start_time = time.time()
 counter = 0
 
 b_load = True
-ckpt_dir = 'checkpoint_male'
+ckpt_dir = 'checkpoint_blonde'
+
+
+def merge(images, size):
+    print('image shape',images.shape)
+    h, w = images.shape[1], images.shape[2]
+    img = np.zeros((h * size[0], w * size[1], 3))
+    print('img shape ',img.shape)
+    for idx, image in enumerate(images):
+        i = idx % size[1]
+        j = idx // size[1]
+        img[j*h:j*h+h, i*w:i*w+w, :] = image
+
+    return img
+
+
 
 with tf.Session() as sess:
     tf.global_variables_initializer().run()
 
-    num_batches = len(data_train) // batch_size
+    num_batches = len(data_sample) // batch_size
 
     if b_load:
+        file_counter = 0
         ckpt = tf.train.get_checkpoint_state(ckpt_dir)
         weight_saver.restore(sess, ckpt.model_checkpoint_path)
         counter = int(ckpt.model_checkpoint_path.split('-', 1)[1]) 
         print "successfully restored!" + " counter:", counter
-        
-    for epoch in range(num_epochs):
-
-        np.random.shuffle(data_train)
-
-        total_errD = 2
-
-        for idx in xrange(num_batches):
-            batch_filenames = data_train[idx*batch_size : (idx+1)*batch_size]
-            
-            batch_origs, batch_inputs = get_images(batch_filenames,128)
-            
+        head = open("head.html","rb").read()
+        htmlfile = open(samples_dir + "/index{}.html".format(file_counter),"wb")
+        htmlfile.write(head)
+        print("num of batches ",num_batches)
+        final_idx = 0
+        for idx in xrange(num_batches+1):
+            final_idx = idx + 1
             # discriminator batch is different since we are doing unpaired experiment
-            rand_idx = np.random.randint(len(data_disc)-batch_size-1)
-            disc_batch_files = data_disc[rand_idx: rand_idx+batch_size]     
-            disc_batch_orig, disc_batch_inputs = get_images(disc_batch_files,128)
+
+            names = data_sample[idx*batch_size: (idx+1)*batch_size]
+            # names_arr = [i[-10:]for i in names]
+            # names_arr= np.array(names_arr).reshape(20,10)
 
 
-            # errD_fake = d_loss_fake.eval({inputs: batch_inputs})
-            # errD_real = d_loss_real.eval({real_ims: disc_batch_orig})
-            # errG = g_loss.eval({ inputs: batch_inputs, real_ims: disc_batch_orig})
-
-            if total_errD > 1:
-                fetches = [d_loss_fake, d_loss_real, g_loss_adv, d_optim, g_optim]
-                errD_fake, errD_real, errG, _, _ = sess.run(fetches, feed_dict={ inputs: batch_inputs, real_ims: disc_batch_orig})
-            else:
-                fetches = [d_loss_fake, d_loss_real, g_loss_adv, g_optim]
-                errD_fake, errD_real, errG, _ = sess.run(fetches, feed_dict={ inputs: batch_inputs, real_ims: disc_batch_orig})
-
-            total_errD = errD_fake + errD_real
+            # df = pd.DataFrame(names_arr)
+            # df.to_csv("file_path.csv")
 
 
+            # np.savetxt("test_{:04d}.csv".format(idx), names_arr, delimiter=",")
+            # now testing metrics
+            val = 1.0
+            sample_origs, sample_inputs = get_images(names,128,val=val)
+            sample = sess.run(gen_test, feed_dict={inputs: sample_inputs})
+            sample  = np.array([imresize(im, val, interp='bicubic') for im in sample])
 
-            counter += 1
-            print("Epoch: [%2d] [%4d/%4d] time: %4.4f, d_loss_fake: %.3f, d_loss_real: %.3f, g_loss: %.8f" \
-                % (epoch, idx, num_batches,
-                    time.time() - start_time, errD_fake, errD_real, errG))
+
+            # final = np.concatenate([sample_origs,sample],axis=2)
 
 
-            if np.mod(counter, 300) == 1:
+            # np.transpose(b,[1,0,2]).reshape(5,-1)
 
-                 # training metrics first
-                train_summary = sess.run([merged_summary_train], feed_dict={ inputs: batch_inputs, real_ims: batch_origs})
-                train_writer.add_summary(train_summary[0], counter)
+            # save an image, with the original next to the generated one
+            # check_origs = np.transpose(sample_origs,[1,0,2,3])
+            # check_origs=  check_origs.reshape([image_h]+[-1,3])
 
-                # now testing metrics
-                rand_idx = np.random.randint(len(data_sample)-batch_size+1)
-                sample_origs, sample_inputs = get_images(data_sample[rand_idx: rand_idx+batch_size],128)
+            # sample_origs = np.swapaxes(check_origs,0,1 )
+            # print(check_origs.shape,sample_origs.shape)
+            # resz_input = sample_inputs[0].repeat(axis=0,repeats=4).repeat(axis=1,repeats=4)
+            # merge_im = np.zeros( (image_h*2, image_h*10, 3) )
+            # merge_im[:image_h, :, :] = (sample_origs+1)*127.5
+            # merge_im[image_h:image_h*2,:, :] = (sample_origs+1)*127.5           
+            print("ids done "+str(idx))
+            htmlfile.write("<img src='test_{:06d}_real.png'>".format(idx))
+            htmlfile.write("<img src='test_{:06d}_gen.png'>".format(idx))
+            imsave(samples_dir + '/test_{:06d}_real.png'.format(idx), sample_origs[0])
+            imsave(samples_dir + '/test_{:06d}_gen.png'.format(idx), sample[0])
+            if idx%2000==0 and idx != 0:
+                htmlfile.write("</body></html>".format(idx)) 
+                htmlfile.close()   
+                file_counter += 1
+                htmlfile = open(samples_dir + "/index{}.html".format(file_counter),"wb")
+                htmlfile.write(head)
+        htmlfile.write("</body></html>".format(idx)) 
+        htmlfile.close()
 
-                sample = sess.run([gen_test], feed_dict={inputs: sample_inputs})
-
-                err_im_LR = sess.run([err_im_LR_t], feed_dict={inputs: sample_inputs})
-                resz_err_im = err_im_LR[0][0].repeat(axis=0,repeats=4).repeat(axis=1,repeats=4)
-
-                test_summary = sess.run([merged_summary_test], feed_dict={ inputs: sample_inputs, real_ims: sample_origs})
-                test_writer.add_summary(test_summary[0], counter)
-
-                # save an image, with the original next to the generated one
-                resz_input = sample_inputs[0].repeat(axis=0,repeats=4).repeat(axis=1,repeats=4)
-                merge_im = np.zeros( (image_h, image_h*4, 3) )
-                merge_im[:, :image_h, :] = (sample_origs[0]+1)*127.5
-                merge_im[:, image_h:image_h*2, :] = (resz_input+1)*127.5
-                merge_im[:, image_h*2:image_h*3, :] = (sample[0][0]+1)*127.5
-                merge_im[:, image_h*3:, :] = (resz_err_im+1)*127.5
-
-                imsave(samples_dir + '/test_{:02d}_{:04d}.png'.format(epoch, idx), merge_im)
-
-            if np.mod(counter, 3000) == 2:
-                weight_saver.save(sess, checkpoint_dir + '/model', counter)
-                print "saving a checkpoint"
+            # break

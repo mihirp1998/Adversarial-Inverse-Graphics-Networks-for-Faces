@@ -326,6 +326,8 @@ test_writer = tf.summary.FileWriter('./logs_male/test')
 print "initialization done"
 
 
+
+
 #############
 # TRAINING
 ############
@@ -333,18 +335,22 @@ print "initialization done"
 female_data_dir = '/home_01/f20150198/datasets/celebA/celeba_male'
 # from
 male_data_dir = '/home_01/f20150198/datasets/celebA/celeba_female'
+sample_data_dir = '/home_01/f20150198/aigan-kat/best_male'
 
 
 female_data = glob(os.path.join(female_data_dir, "*.png"))
 male_data = glob(os.path.join(male_data_dir, "*.png"))
+sample_data = glob(os.path.join(sample_data_dir, "*gen.png"))
 
 data_disc, female_data_nondisc = train_test_split(female_data, test_size=0.5, random_state=42)
 
 female_data_train, female_data_sample = train_test_split(female_data_nondisc, test_size=0.9, random_state=42)
 male_data_train, male_data_sample = train_test_split(male_data, test_size=0.1, random_state=42)
 data_train = female_data_train + male_data_train
-data_sample =  male_data_sample
-
+data_sample =  sample_data
+print("getting images ",len(data_sample))
+sample_origs, sample_inputs = get_images(data_sample,128)
+print("done getting images ")
 
 # # to these images --> data_disc 
 # data_disc, female_data_nondisc = train_test_split(female_data, test_size=0.1, random_state=42)
@@ -362,11 +368,11 @@ print "data disc:", len(data_disc)
 print "data sample:", len(data_sample)
 
 # create directories to save checkpoint and samples
-samples_dir = 'samples_male'
+samples_dir = 'samples_best_male'
 if not os.path.exists(samples_dir):
     os.makedirs(samples_dir)
 
-checkpoint_dir = 'checkpoint_male'
+checkpoint_dir = 'checkpoint_temp_male'
 if not os.path.exists(checkpoint_dir):
     os.makedirs(checkpoint_dir)
 
@@ -377,8 +383,22 @@ print "-----------"
 start_time = time.time()
 counter = 0
 
-b_load = True
-ckpt_dir = 'checkpoint_male'
+b_load = False
+ckpt_dir = 'checkpoint_temp_male'
+
+
+def merge(images, size):
+    # print('image shape',images.shape)
+    h, w = images.shape[1], images.shape[2]
+    img = np.zeros((h * size[0], w * size[1], 3))
+    # print('img shape ',img.shape)
+    for idx, image in enumerate(images):
+        i = idx % size[1]
+        j = idx // size[1]
+        img[j*h:j*h+h, i*w:i*w+w, :] = image
+
+    return img
+
 
 with tf.Session() as sess:
     tf.global_variables_initializer().run()
@@ -429,34 +449,34 @@ with tf.Session() as sess:
                     time.time() - start_time, errD_fake, errD_real, errG))
 
 
-            if np.mod(counter, 300) == 1:
+            if np.mod(counter, 100) == 0:
 
                  # training metrics first
-                train_summary = sess.run([merged_summary_train], feed_dict={ inputs: batch_inputs, real_ims: batch_origs})
-                train_writer.add_summary(train_summary[0], counter)
+                # train_summary = sess.run([merged_summary_train], feed_dict={ inputs: batch_inputs, real_ims: batch_origs})
+                # train_writer.add_summary(train_summary[0], counter)
 
                 # now testing metrics
-                rand_idx = np.random.randint(len(data_sample)-batch_size+1)
-                sample_origs, sample_inputs = get_images(data_sample[rand_idx: rand_idx+batch_size],128)
+                # rand_idx = np.random.randint(len(data_sample)-batch_size+1)
+                
 
-                sample = sess.run([gen_test], feed_dict={inputs: sample_inputs})
+                sample = sess.run(gen_test, feed_dict={inputs: sample_inputs})
+                merged = merge(sample,[5,5])
+                # err_im_LR = sess.run([err_im_LR_t], feed_dict={inputs: sample_inputs})
+                # resz_err_im = err_im_LR[0][0].repeat(axis=0,repeats=4).repeat(axis=1,repeats=4)
 
-                err_im_LR = sess.run([err_im_LR_t], feed_dict={inputs: sample_inputs})
-                resz_err_im = err_im_LR[0][0].repeat(axis=0,repeats=4).repeat(axis=1,repeats=4)
-
-                test_summary = sess.run([merged_summary_test], feed_dict={ inputs: sample_inputs, real_ims: sample_origs})
-                test_writer.add_summary(test_summary[0], counter)
-
+                # test_summary = sess.run([merged_summary_test], feed_dict={ inputs: sample_inputs, real_ims: sample_origs})
+                # test_writer.add_summary(test_summary[0], counter)
+                # print("sample shape ",sample.shape)
                 # save an image, with the original next to the generated one
-                resz_input = sample_inputs[0].repeat(axis=0,repeats=4).repeat(axis=1,repeats=4)
-                merge_im = np.zeros( (image_h, image_h*4, 3) )
-                merge_im[:, :image_h, :] = (sample_origs[0]+1)*127.5
-                merge_im[:, image_h:image_h*2, :] = (resz_input+1)*127.5
-                merge_im[:, image_h*2:image_h*3, :] = (sample[0][0]+1)*127.5
-                merge_im[:, image_h*3:, :] = (resz_err_im+1)*127.5
+                # resz_input = sample_inputs[0].repeat(axis=0,repeats=4).repeat(axis=1,repeats=4)
+                # merge_im = np.zeros( (image_h, image_h*4, 3) )
+                # merge_im[:, :image_h, :] = (sample_origs[0]+1)*127.5
+                # merge_im[:, image_h:image_h*2, :] = (resz_input+1)*127.5
+                # merge_im[:, image_h*2:image_h*3, :] = (sample[0][0]+1)*127.5
+                # merge_im[:, image_h*3:, :] = (resz_err_im+1)*127.5
 
-                imsave(samples_dir + '/test_{:02d}_{:04d}.png'.format(epoch, idx), merge_im)
+                imsave(samples_dir + '/test_{:02d}_{:04d}.png'.format(epoch, idx), merged)
 
-            if np.mod(counter, 3000) == 2:
+            if np.mod(counter, 3000) == 0:
                 weight_saver.save(sess, checkpoint_dir + '/model', counter)
                 print "saving a checkpoint"

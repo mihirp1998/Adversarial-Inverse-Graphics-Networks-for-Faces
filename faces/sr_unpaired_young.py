@@ -58,9 +58,15 @@ def create_error_metrics(gen, inputs, origs):
     # Losses
 
     # metric: L2 between downsampled generated output and input
+    inputs_gray = tf.image.rgb_to_grayscale(inputs)
     gen_LR = slim.avg_pool2d(gen, [4, 4], stride=4, padding='SAME')
+    
+    gen_LR_gray = tf.image.rgb_to_grayscale(gen_LR)
+    gen_mse_LR_gray = tf.reduce_mean(tf.square(tf.contrib.layers.flatten(gen_LR_gray - inputs_gray)), 1)
+    gen_L2_LR_gray = tf.reduce_mean(gen_mse_LR_gray)
+
     gen_mse_LR = tf.reduce_mean(tf.square(tf.contrib.layers.flatten(gen_LR - inputs)), 1)
-    gen_L2_LR = tf.reduce_mean(gen_mse_LR)
+    gen_L2_LR = tf.reduce_mean(gen_mse_LR) + gen_L2_LR_gray
 
     # metric: L2 between generated output and the original image
     gen_mse_HR = tf.reduce_mean(tf.square(tf.contrib.layers.flatten(gen - origs)), 1)
@@ -74,7 +80,7 @@ def create_error_metrics(gen, inputs, origs):
     err_im_HR = gen - origs
     err_im_LR = gen_LR - inputs
 
-    return gen_L2_LR, gen_L2_HR, gen_PSNR, err_im_LR, err_im_HR
+    return gen_L2_LR , gen_L2_HR, gen_PSNR, err_im_LR, err_im_HR
 
 
 class batch_norm(object):
@@ -98,7 +104,7 @@ class batch_norm(object):
                                     initializer=tf.random_normal_initializer(1., 0.02))
 
                 # huge hack
-                with tf.variable_scope(tf.get_variable_scope(), reuse=False):
+                with tf.variable_scope(tf.get_variable_scope(), reuse=tf.AUTO_REUSE):
                     batch_mean, batch_var = tf.nn.moments(x, [0, 1, 2], name='moments')
                     ema_apply_op = self.ema.apply([batch_mean, batch_var])
                     self.ema_mean, self.ema_var = self.ema.average(batch_mean), self.ema.average(batch_var)
@@ -140,8 +146,8 @@ inputs = tf.placeholder(tf.float32, [None, image_h/4, image_w/4, 3], name='input
 
 
 # generator section
-print "GENERATOR"
-print "-----------"
+print ("GENERATOR")
+print ("-----------")
 
 # this is really bad
 batch_norm_list = []
@@ -197,8 +203,8 @@ with tf.variable_scope("generator") as scope:
     gen_test = create_generator(inputs, False)
 
 
-print "DISCRIMINATOR"
-print "--------------"
+print ("DISCRIMINATOR")
+print ("--------------")
 #disc_bn1 = batch_norm(name='d_bn1')
 disc_bn2 = batch_norm(name='d_bn2')
 disc_bn3 = batch_norm(name='d_bn3')
@@ -318,20 +324,20 @@ ups_PSNR = tf.summary.scalar("ups_PSNR_HR", ups_PSNR)
 
 merged_summary_train = tf.summary.merge([d_loss_train, g_L2LR_train, g_loss_adv_train, g_L2HR_train, g_PSNR_train, ups_L2HR, ups_PSNR])
 merged_summary_test = tf.summary.merge([g_L2LR_test, g_L2HR_test, g_PSNR_test, ups_L2HR, ups_PSNR])
-train_writer = tf.summary.FileWriter('./logs_young/train')
-test_writer = tf.summary.FileWriter('./logs_young/test')
+train_writer = tf.summary.FileWriter('./logs_blonde/train')
+test_writer = tf.summary.FileWriter('./logs_blonde/test')
 
 
 
-print "initialization done"
+print ("initialization done")
 
 
 #############
 # TRAINING
 ############
 
-young_data_dir = '/home/wseto/datasets/celeba_young'
-old_data_dir = '/home/wseto/datasets/celeba_old'
+young_data_dir = '/home_01/f20150198/datasets/celebA/celeba_blond'
+old_data_dir = '/home_01/f20150198/datasets/celebA/celeba_blackhair'
 
 young_data = glob(os.path.join(young_data_dir, "*.png"))
 old_data = glob(os.path.join(old_data_dir, "*.png"))
@@ -344,30 +350,30 @@ old_data_train, old_data_sample = train_test_split(old_data, test_size=0.15, ran
 data_train = old_data_train + young_data_train
 data_sample = old_data_sample + young_data_sample
 
-print len(old_data_train)
+print (len(old_data_train))
 
-print "data train:", len(data_train)
-print "data disc:", len(data_disc)
-print "data sample:", len(data_sample)
+print ("data train:", len(data_train))
+print ("data disc:", len(data_disc))
+print ("data sample:", len(data_sample))
 
 # create directories to save checkpoint and samples
-samples_dir = 'samples_young'
+samples_dir = 'samples_blonde'
 if not os.path.exists(samples_dir):
     os.makedirs(samples_dir)
 
-checkpoint_dir = 'checkpoint_young'
+checkpoint_dir = 'checkpoint_blonde'
 if not os.path.exists(checkpoint_dir):
     os.makedirs(checkpoint_dir)
 
 
-print "TRAINING"
-print "-----------"
+print ("TRAINING")
+print ("-----------")
 
 start_time = time.time()
 counter = 0
 
-b_load = False
-#ckpt_dir = '/home/wseto/dcgan/checkpoint_up_rand'
+b_load = True
+ckpt_dir = 'checkpoint_blonde'
 
 with tf.Session() as sess:
     tf.global_variables_initializer().run()
@@ -378,7 +384,7 @@ with tf.Session() as sess:
         ckpt = tf.train.get_checkpoint_state(ckpt_dir)
         weight_saver.restore(sess, ckpt.model_checkpoint_path)
         counter = int(ckpt.model_checkpoint_path.split('-', 1)[1]) 
-        print "successfully restored!" + " counter:", counter
+        print ("successfully restored!" + " counter:", counter)
         
     for epoch in range(num_epochs):
 
@@ -389,12 +395,12 @@ with tf.Session() as sess:
         for idx in xrange(num_batches):
             batch_filenames = data_train[idx*batch_size : (idx+1)*batch_size]
             
-            batch_origs, batch_inputs = get_images(batch_filenames)
+            batch_origs, batch_inputs = get_images(batch_filenames,128)
             
             # discriminator batch is different since we are doing unpaired experiment
             rand_idx = np.random.randint(len(data_disc)-batch_size-1)
             disc_batch_files = data_disc[rand_idx: rand_idx+batch_size]     
-            disc_batch_orig, disc_batch_inputs = get_images(disc_batch_files)
+            disc_batch_orig, disc_batch_inputs = get_images(disc_batch_files,128)
 
 
             # errD_fake = d_loss_fake.eval({inputs: batch_inputs})
@@ -418,7 +424,7 @@ with tf.Session() as sess:
                     time.time() - start_time, errD_fake, errD_real, errG))
 
 
-            if np.mod(counter, 30) == 1:
+            if np.mod(counter, 240) == 1:
 
                  # training metrics first
                 train_summary = sess.run([merged_summary_train], feed_dict={ inputs: batch_inputs, real_ims: batch_origs})
@@ -426,7 +432,7 @@ with tf.Session() as sess:
 
                 # now testing metrics
                 rand_idx = np.random.randint(len(data_sample)-batch_size+1)
-                sample_origs, sample_inputs = get_images(data_sample[rand_idx: rand_idx+batch_size])
+                sample_origs, sample_inputs = get_images(data_sample[rand_idx: rand_idx+batch_size],128)
 
                 sample = sess.run([gen_test], feed_dict={inputs: sample_inputs})
 
@@ -446,6 +452,6 @@ with tf.Session() as sess:
 
                 imsave(samples_dir + '/test_{:02d}_{:04d}.png'.format(epoch, idx), merge_im)
 
-            if np.mod(counter, 1000) == 2:
+            if np.mod(counter, 2000) == 2:
                 weight_saver.save(sess, checkpoint_dir + '/model', counter)
-                print "saving a checkpoint"
+                print ("saving a checkpoint")
